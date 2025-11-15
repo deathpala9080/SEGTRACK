@@ -23,7 +23,7 @@ class ModuloUsuario {
                     INNER JOIN funcionario f 
                         ON u.IdFuncionario = f.IdFuncionario
                     WHERE f.CorreoFuncionario = :correo 
-                       OR f.DocumentoFuncionario = :correo
+                        OR f.DocumentoFuncionario = :correo
                     LIMIT 1";
 
             $stmt = $this->conexion->prepare($sql);
