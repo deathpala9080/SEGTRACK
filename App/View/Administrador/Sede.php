@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../Plantilla/parte_superior.php';
-require_once __DIR__ . "/../Controller/Sede_institucion_funcionario_usuario/Controladorsede.php";
+require_once __DIR__ . '/../layouts/parte_superior.php';
+require_once __DIR__ . "/../../Controller/Controladorsede.php";
 
 $controlador = new ControladorSede();
 $instituciones = $controlador->obtenerInstituciones(); // Carga las instituciones al inicio
@@ -66,6 +66,6 @@ $instituciones = $controlador->obtenerInstituciones(); // Carga las institucione
 <script src="../vendor/jquery/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script src="../js/javascript/js/sede.js"></script>
+<script src="../../../Public/js/javascript/js/sede.js"></script>
 
-<?php require_once __DIR__ . '/../Plantilla/parte_inferior.php'; ?>
+<?php require_once __DIR__ . '/../layouts/parte_inferior.php'; ?>

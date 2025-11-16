@@ -1,6 +1,6 @@
 modeloinstituto.php
 <?php
-require_once __DIR__ . '/../../Core/conexion.php';
+require_once __DIR__ . '/../Core/conexion.php';
 
 class ModeloInstituto
 {

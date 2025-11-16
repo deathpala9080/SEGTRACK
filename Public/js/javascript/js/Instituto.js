@@ -1,55 +1,81 @@
 $(document).ready(function () {
 
-    // ===== VALIDACIÓN DE CAMPOS EN TIEMPO REAL =====
-
+    // ===== FUNCIONES DE VALIDACIÓN =====
+    
     function marcarInvalido(campo) {
-        campo.css("border", "2px solid #ef4444"); // rojo
+        campo.removeClass("campo-valido").addClass("campo-invalido");
     }
 
     function marcarValido(campo) {
-        campo.css("border", "2px solid #10b981"); // verde
+        campo.removeClass("campo-invalido").addClass("campo-valido");
     }
 
-    // 1. Nombre: Solo acepta letras y elimina cualquier otro carácter.
+    function marcarNeutral(campo) {
+        campo.removeClass("campo-valido campo-invalido");
+    }
+
+    // ===== VALIDACIÓN EN TIEMPO REAL (VERDE/ROJO INMEDIATO) =====
+
+    // 1. NOMBRE DE INSTITUCIÓN: Solo letras, espacios y tildes (mínimo 3 caracteres)
     $("#NombreInstitucion").on("input", function () {
         let campo = $(this);
         let valor = campo.val();
-        // Regex que solo permite letras (mayúsculas, minúsculas, tildes, ñ) y espacios.
-        const soloLetrasRegex = /^[A-Za-zÁÉÍÓÚÑáéíóúñ ]+$/;
         
-        // 🔥 CORRECCIÓN CLAVE: Eliminar caracteres no permitidos
-        let valorLimpio = valor.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ ]/g, ""); 
+        // Eliminar caracteres no permitidos automáticamente
+        let valorLimpio = valor.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ ]/g, "");
         campo.val(valorLimpio);
 
-        if (soloLetrasRegex.test(valorLimpio) && valorLimpio.length > 0) {
-            marcarValido(campo);
+        // Validar: solo letras y espacios, mínimo 3 caracteres
+        if (valorLimpio.length >= 3 && /^[A-Za-zÁÉÍÓÚÑáéíóúñ ]+$/.test(valorLimpio)) {
+            marcarValido(campo); // ✅ VERDE
         } else {
-            marcarInvalido(campo);
+            marcarInvalido(campo); // ❌ ROJO
         }
     });
 
-    // 2. NIT: Solo acepta 10 números, se pone verde solo al llegar a 10.
+    // 2. NIT/CÓDIGO: Exactamente 10 números
     $("#Nit_Codigo").on("input", function () {
-        let valor = $(this).val().replace(/\D/g, "");
-        $(this).val(valor.substring(0, 10));
+        let campo = $(this);
+        let valor = campo.val();
+        
+        // Eliminar todo excepto números
+        let valorLimpio = valor.replace(/\D/g, "");
+        
+        // Limitar a 10 dígitos máximo
+        valorLimpio = valorLimpio.substring(0, 10);
+        campo.val(valorLimpio);
 
-        if (valor.length === 10) {
-            marcarValido($(this)); // Se pone verde
+        // Validar: exactamente 10 números
+        if (valorLimpio.length === 10) {
+            marcarValido(campo); // ✅ VERDE
         } else {
-            marcarInvalido($(this)); // Se pone rojo
+            marcarInvalido(campo); // ❌ ROJO
         }
     });
 
-    // Selects (Tipo y Estado) - Se mantienen igual
-    $("#TipoInstitucion, #EstadoInstitucion").on("change", function () {
-        if ($(this).val() !== "") {
-            marcarValido($(this));
+    // 3. TIPO DE INSTITUCIÓN: Debe seleccionar una opción válida
+    $("#TipoInstitucion").on("change", function () {
+        let campo = $(this);
+        
+        if (campo.val() !== "") {
+            marcarValido(campo); // ✅ VERDE
         } else {
-            marcarInvalido($(this));
+            marcarInvalido(campo); // ❌ ROJO
         }
     });
 
-    // ========= ENVÍO DEL FORMULARIO ==========
+    // 4. ESTADO: Debe seleccionar una opción válida
+    $("#EstadoInstitucion").on("change", function () {
+        let campo = $(this);
+        
+        if (campo.val() !== "") {
+            marcarValido(campo); // ✅ VERDE
+        } else {
+            marcarInvalido(campo); // ❌ ROJO
+        }
+    });
+
+    // ===== ENVÍO DEL FORMULARIO =====
     $("#formInstituto").submit(function (e) {
         e.preventDefault();
 
@@ -61,33 +87,37 @@ $(document).ready(function () {
         let errores = [];
 
         // VALIDACIONES FINALES
-        if (!/^[A-Za-zÁÉÍÓÚÑáéíóúñ ]+$/.test(nombre.val()) || nombre.val().trim() === "") {
-            errores.push("El nombre solo puede contener letras y no puede estar vacío.");
+        if (nombre.val().length < 3 || !/^[A-Za-zÁÉÍÓÚÑáéíóúñ ]+$/.test(nombre.val())) {
+            errores.push("• El nombre debe contener solo letras (mínimo 3 caracteres)");
             marcarInvalido(nombre);
         }
 
         if (nit.val().length !== 10) {
-            errores.push("El NIT debe tener exactamente 10 números.");
+            errores.push("• El NIT debe tener exactamente 10 números");
             marcarInvalido(nit);
         }
 
         if (tipo.val() === "") {
-            errores.push("Debe seleccionar un tipo de institución.");
+            errores.push("• Debe seleccionar un tipo de institución");
             marcarInvalido(tipo);
         }
 
         if (estado.val() === "") {
-            errores.push("Debe seleccionar el estado de la institución.");
+            errores.push("• Debe seleccionar el estado de la institución");
             marcarInvalido(estado);
         }
 
-        // Si hay errores, mostrar alerta SweetAlert2
+        // Si hay errores, mostrar alerta SweetAlert2 ROJA
         if (errores.length > 0) {
             Swal.fire({
                 icon: "error",
-                title: "Campos inválidos",
-                html: errores.join("<br>"),
+                title: "Error de validación",
+                html: "<div style='text-align: left;'>" + errores.join("<br>") + "</div>",
+                confirmButtonText: "OK",
                 confirmButtonColor: "#ef4444",
+                customClass: {
+                    popup: 'swal-error-popup'
+                }
             });
             return;
         }
@@ -103,41 +133,41 @@ $(document).ready(function () {
             url: $(this).attr('action'),
             type: "POST",
             data: $(this).serialize(),
-            // Se sugiere usar JSON, si el backend lo permite
-            // dataType: "json", 
             
             success: function (data) {
                 console.log("Respuesta del servidor:", data);
 
-                // Comprobación de éxito basada en texto (la que tenías)
-                if (data.includes("✅") || data.includes("correctamente")) {
+                if (data.includes("✅") || data.includes("correctamente") || data.includes("éxito")) {
                     Swal.fire({
                         icon: "success",
                         title: "Registro exitoso",
-                        // 🔥 CAMBIO: Eliminando el texto crudo 'data' de la alerta
                         text: 'La institución ha sido registrada correctamente.', 
+                        confirmButtonText: "OK",
                         confirmButtonColor: "#10b981"
+                    }).then(() => {
+                        $("#formInstituto")[0].reset();
+                        // Resetear todos los campos a neutro
+                        $("#NombreInstitucion, #Nit_Codigo, #TipoInstitucion, #EstadoInstitucion").each(function() {
+                            marcarNeutral($(this));
+                        });
                     });
-
-                    $("#formInstituto")[0].reset();
-                    // Restablece el borde a un color neutro
-                    $("input, select").css("border", "2px solid #d1d3e2"); 
                 } else {
                     Swal.fire({
                         icon: "error",
-                        title: "Error",
-                        // Si no fue exitoso, muestra el mensaje de error del servidor
+                        title: "Error en el registro",
                         text: data, 
+                        confirmButtonText: "OK",
                         confirmButtonColor: "#ef4444"
                     });
                 }
             },
             error: function () {
                 Swal.fire({
-                    icon: "warning",
+                    icon: "error",
                     title: "Error de conexión",
-                    text: "No se pudo contactar con el servidor",
-                    confirmButtonColor: "#f59e0b"
+                    text: "No se pudo contactar con el servidor. Intente nuevamente.",
+                    confirmButtonText: "OK",
+                    confirmButtonColor: "#ef4444"
                 });
             },
             complete: function () {

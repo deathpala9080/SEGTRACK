@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/../../Model/sede_institucion_funcionario_usuario/modelosede.php";
+require_once __DIR__ . "/../Model/modelosede.php";
 
 class ControladorSede {
 
