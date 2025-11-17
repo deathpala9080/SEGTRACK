@@ -1,6 +1,10 @@
 <?php
+// ✅ Iniciar sesión solo si no hay ninguna activa
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
-// Verificar sesión activa
+// ✅ Verificar si hay usuario logueado
 if (!isset($_SESSION['usuario'])) {
     echo "<script>
         alert('⚠️ Debes iniciar sesión primero.');
@@ -9,7 +13,7 @@ if (!isset($_SESSION['usuario'])) {
     exit;
 }
 
-// Capturar el nombre del usuario logueado
+// ✅ Capturar el nombre del usuario, siempre que exista
 $nombreUsuario = htmlspecialchars($_SESSION['usuario']['NombreFuncionario'] ?? 'Usuario');
 ?>
 <!DOCTYPE html>
@@ -156,7 +160,7 @@ $nombreUsuario = htmlspecialchars($_SESSION['usuario']['NombreFuncionario'] ?? '
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-toggle="dropdown">
                                 <!-- Aquí se muestra el nombre dinámico del usuario -->
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small"><?= $nombreUsuario ?></span>
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small"><?= isset($nombreUsuario) ? $nombreUsuario : 'Usuario' ?></span>
 
                                 <img class="img-profile rounded-circle"
                                      src="../../../Public/img/undraw_profile.svg">
