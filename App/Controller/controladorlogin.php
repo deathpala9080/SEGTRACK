@@ -29,28 +29,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $resultado['usuario']['TipoRol'] = $nuevoRol;
         }
 
-        // Guardar en sesión
+        // =======================================================
+        // Guardar en sesión (después del login exitoso)
+        // =======================================================
         $_SESSION['usuario'] = $resultado['usuario'];
+        // Línea clave: Guarda el nombre del funcionario
+        $_SESSION['nombre_usuario'] = $resultado['usuario']['NombreFuncionario'];
+        // Línea adicional: Guarda el Rol
+        $_SESSION['tipo_rol'] = $resultado['usuario']['TipoRol'];
 
         // Redirección según rol
-switch ($resultado['usuario']['TipoRol']) {
+        switch ($resultado['usuario']['TipoRol']) {
 
-    case 'Administrador':
-        $ruta = '../View/Administrador/DasboardAdministrador.php';
-        break;
+            case 'Administrador':
+                $ruta = '../View/Administrador/DasboardAdministrador.php';
+                break;
 
-    case 'Supervisor':
-        $ruta = '../View/Supervisor/DasboardSupervisor.php';
-        break;
+            case 'Supervisor':
+                $ruta = '../View/Supervisor/DasboardSupervisor.php';
+                break;
 
-    case 'Personal Seguridad':
-        $ruta = '../View/PersonalSeguridad/DasboardPersonalSeguridad.php';
-        break;
+            case 'Personal Seguridad':
+                $ruta = '../View/PersonalSeguridad/DasboardPersonalSeguridad.php';
+                break;
 
-    default:
-        $ruta = '../View/login/Login.php';
-        break;
-}
+            default:
+                $ruta = '../View/login/Login.php';
+                break;
+        }
 
         // Alerta de éxito y redirección
         echo "<!DOCTYPE html>
@@ -98,6 +104,4 @@ Swal.fire({
         exit;
     }
 }
-
 ?>
-
