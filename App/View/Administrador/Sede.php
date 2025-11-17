@@ -94,4 +94,4 @@ $instituciones = $controlador->obtenerInstituciones();
 
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="../../../Public/js/javascript/js/sede.js"></script>
+<script src="../../../Public/js/javascript/js/ValidacionesSede.js"></script>
