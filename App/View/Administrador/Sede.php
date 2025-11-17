@@ -92,6 +92,6 @@ $instituciones = $controlador->obtenerInstituciones();
 
 <?php require_once __DIR__ . '/../layouts/parte_inferior.php'; ?>
 
-
+<script src="../../../Public/js/javascript/session_check.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="../../../Public/js/javascript/js/ValidacionesSede.js"></script>

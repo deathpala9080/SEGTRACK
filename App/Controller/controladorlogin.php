@@ -29,14 +29,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $resultado['usuario']['TipoRol'] = $nuevoRol;
         }
 
-        // =======================================================
-        // Guardar en sesión (después del login exitoso)
-        // =======================================================
+        // Guardar en sesión
         $_SESSION['usuario'] = $resultado['usuario'];
-        // Línea clave: Guarda el nombre del funcionario
-        $_SESSION['nombre_usuario'] = $resultado['usuario']['NombreFuncionario'];
-        // Línea adicional: Guarda el Rol
-        $_SESSION['tipo_rol'] = $resultado['usuario']['TipoRol'];
+        // ✅ Evitar que el usuario vuelva a la página anterior con el botón atrás
+        header("Cache-Control: no-cache, no-store, must-revalidate");
+        header("Pragma: no-cache");
+        header("Expires: 0");
 
         // Redirección según rol
         switch ($resultado['usuario']['TipoRol']) {
@@ -104,4 +102,5 @@ Swal.fire({
         exit;
     }
 }
+
 ?>

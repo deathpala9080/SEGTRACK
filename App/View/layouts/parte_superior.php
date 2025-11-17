@@ -1,3 +1,17 @@
+<?php
+
+// Verificar sesión activa
+if (!isset($_SESSION['usuario'])) {
+    echo "<script>
+        alert('⚠️ Debes iniciar sesión primero.');
+        window.location.href = '../Login/Login.php';
+    </script>";
+    exit;
+}
+
+// Capturar el nombre del usuario logueado
+$nombreUsuario = htmlspecialchars($_SESSION['usuario']['NombreFuncionario'] ?? 'Usuario');
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -43,19 +57,14 @@
 
             <!-- Sección de Funcionario -->
             <li class="nav-item">
-                <!-- Botón que despliega submenú -->
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo">
                     <i class="fas fa-fw fa-cog"></i>
                     <span>Funcionario</span>
                 </a>
 
-                <!-- Contenedor del submenú -->
                 <div id="collapseTwo" class="collapse" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        
-                        <!-- Subtítulo -->
                         <h6 class="collapse-header">Funcionarios:</h6>
-                        <!-- Opciones -->
                         <a class="collapse-item" href="../PersonalSeguridad/Funcionario.php">Registrar Funcionario</a>
                         <a class="collapse-item" href="../PersonalSeguridad/FuncionarioLista.php">Lista de Funcionarios</a>
 
@@ -76,16 +85,13 @@
 
             <!-- Control de Bitácora -->
             <li class="nav-item">
-                <!-- Botón para submenú -->
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities">
                     <i class="fas fa-fw fa-wrench"></i>
                     <span>Control Bitácora</span>
                 </a>
 
-                <!-- Submenú -->
                 <div id="collapseUtilities" class="collapse" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-
                         <h6 class="collapse-header">Bitácora</h6>
                         <a class="collapse-item" href="../PersonalSeguridad/Bitacora.php">Registro de Bitácora</a>
                         <a class="collapse-item" href="../PersonalSeguridad/BitacoraLista.php">Ingreso Bitácora</a>
@@ -101,7 +107,6 @@
                         <h6 class="collapse-header">Visitantes</h6>
                         <a class="collapse-item" href="../PersonalSeguridad/Visitante.php">Registro Visitante</a>
                         <a class="collapse-item" href="../PersonalSeguridad/VisitanteLista.php">Lista de Visitantes</a>
-
                     </div>
                 </div>
             </li>
@@ -113,41 +118,34 @@
                     <span>Tabla de ingreso</span>
                 </a>
 
-                <!-- Submenú -->
                 <div id="collapsePages" class="collapse" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-
                         <h6 class="collapse-header">Escanear QR</h6>
                         <a class="collapse-item" href="../PersonalSeguridad/Ingreso.php">Registrar Entrada/Salida</a>
-
                     </div>
                 </div>
             </li>
 
-            <!-- Separador -->
             <hr class="sidebar-divider d-none d-md-block">
 
         </ul>
         <!-- End Sidebar -->
 
-        <!-- Content Wrapper: zona donde va el topbar y el contenido de cada página -->
+        <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
 
-            <!-- Área principal de contenido -->
+            <!-- Main Content -->
             <div id="content">
 
-                <!-- Topbar: barra superior -->
+                <!-- Topbar -->
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 shadow">
 
-                    <!-- Botón para abrir el sidebar en móvil -->
                     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
                         <i class="fa fa-bars"></i>
                     </button>
 
-                    <!-- Botones a la derecha -->
                     <ul class="navbar-nav ml-auto">
 
-                        <!-- Buscador en pantallas pequeñas -->
                         <li class="nav-item dropdown no-arrow d-sm-none">
                             <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" data-toggle="dropdown">
                                 <i class="fas fa-search fa-fw"></i>
@@ -156,21 +154,17 @@
 
                         <!-- Usuario -->
                         <li class="nav-item dropdown no-arrow">
-
-                            <!-- Botón de menú del usuario -->
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-toggle="dropdown">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Usuario</span>
+                                <!-- Aquí se muestra el nombre dinámico del usuario -->
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small"><?= $nombreUsuario ?></span>
 
-                                <!-- Imagen del perfil -->
                                 <img class="img-profile rounded-circle"
                                      src="../../../Public/img/undraw_profile.svg">
                             </a>
 
-                            <!-- Menú desplegable del usuario -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                  aria-labelledby="userDropdown">
 
-                                <!-- Opción Perfil -->
                                 <a class="dropdown-item" href="#">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Perfil
@@ -178,7 +172,6 @@
 
                                 <div class="dropdown-divider"></div>
 
-                                <!-- Opción cerrar sesión -->
                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Cerrar sesión
