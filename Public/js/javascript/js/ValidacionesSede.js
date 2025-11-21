@@ -1,96 +1,191 @@
-// ===============================
-// VALIDACIONES PERSONALIZADAS
-// ===============================
-function validarTexto(texto) {
-    const regex = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{1,30}$/;
-    return regex.test(texto.trim());
-}
+// Public/js/javascript/js/ValidacionesSede.js
 
-function marcarCampo(input, valido) {
-    const label = input.closest(".mb-3").querySelector("label");
-    input.classList.remove("input-valid", "input-invalid");
-    label.classList.remove("label-valid", "label-invalid");
+$(document).ready(function () {
 
-    if (valido) {
-        input.classList.add("input-valid");
-        label.classList.add("label-valid");
-    } else {
-        input.classList.add("input-invalid");
-        label.classList.add("label-invalid");
-    }
-}
+    console.log("=== SISTEMA DE REGISTRO DE SEDE INICIADO ===");
 
-// ===============================
-// VALIDACIÓN EN TIEMPO REAL
-// ===============================
-document.getElementById("TipoSede").addEventListener("input", function () {
-    marcarCampo(this, validarTexto(this.value));
-});
+    // ============================
+    // FUNCIONES VISUALES (CON !important PARA QUE BOOTSTRAP NO DAÑE ESTILOS)
+    // ============================
 
-document.getElementById("Ciudad").addEventListener("input", function () {
-    marcarCampo(this, validarTexto(this.value));
-});
-
-document.getElementById("IdInstitucion").addEventListener("change", function () {
-    marcarCampo(this, this.value !== "");
-});
-
-// ===============================
-// ENVÍO AJAX
-// ===============================
-document.getElementById("formRegistrarSede").addEventListener("submit", function(e) {
-    e.preventDefault();
-
-    const tipoSede = document.getElementById("TipoSede");
-    const ciudad = document.getElementById("Ciudad");
-    const institucion = document.getElementById("IdInstitucion");
-
-    let valido = true;
-
-    if (!validarTexto(tipoSede.value)) { marcarCampo(tipoSede, false); valido = false; }
-    if (!validarTexto(ciudad.value)) { marcarCampo(ciudad, false); valido = false; }
-    if (institucion.value === "") { marcarCampo(institucion, false); valido = false; }
-
-    if (!valido) {
-        Swal.fire({
-            icon: "error",
-            title: "Datos inválidos",
-            text: "Corrige los campos marcados en rojo."
-        });
-        return;
+    function marcarInvalido(campo) {
+        campo.attr("style",
+            "border: 2px solid #ef4444 !important;" +
+            "box-shadow: 0 0 0 0.25rem rgba(239, 68, 68, 0.25) !important;"
+        );
     }
 
-    let formData = new FormData();
-    formData.append("accion", "registrar");
-    formData.append("TipoSede", tipoSede.value);
-    formData.append("Ciudad", ciudad.value);
-    formData.append("IdInstitucion", institucion.value);
+    function marcarValido(campo) {
+        campo.attr("style",
+            "border: 2px solid #10b981 !important;" +
+            "box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25) !important;"
+        );
+    }
 
-    fetch("../../Controller/ControladorSede.php", {
-        method: "POST",
-        body: formData
-    })
-    .then(r => r.json())
-    .then(data => {
-        if (data.success) {
-            Swal.fire({
-                icon: "success",
-                title: "Sede Registrada",
-                text: data.message,
-                timer: 1500,
-                showConfirmButton: false
-            });
+    function marcarNeutral(campo) {
+        campo.attr("style",
+            "border: 1px solid #ced4da !important;" +
+            "box-shadow: none !important;"
+        );
+    }
 
-            this.reset();
+    function inicializarValidacion() {
+        marcarNeutral($("#TipoSede"));
+        marcarNeutral($("#Ciudad"));
+        marcarNeutral($("#IdInstitucion"));
+    }
 
-            [tipoSede, ciudad, institucion].forEach(c => {
-                c.classList.remove("input-valid", "input-invalid");
-                const label = c.closest(".mb-3").querySelector("label");
-                label.classList.remove("label-valid", "label-invalid");
-            });
+    inicializarValidacion();
 
+
+    // ============================
+    // VALIDACIÓN EN TIEMPO REAL
+    // ============================
+
+    function soloTexto(valor) {
+        return /^[A-Za-zÁÉÍÓÚÑáéíóúñ ]+$/.test(valor);
+    }
+
+    // 1. Tipo de Sede
+    $("#TipoSede").on("input", function () {
+        let campo = $(this);
+        let valor = campo.val().replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ ]/g, "");
+        campo.val(valor);
+
+        if (valor.length >= 3 && soloTexto(valor)) {
+            marcarValido(campo);
         } else {
-            Swal.fire({ icon: "error", title: "Error", text: data.message });
+            marcarInvalido(campo);
         }
+    });
+
+    // 2. Ciudad
+    $("#Ciudad").on("input", function () {
+        let campo = $(this);
+        let valor = campo.val().replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ ]/g, "");
+        campo.val(valor);
+
+        if (valor.length >= 3 && soloTexto(valor)) {
+            marcarValido(campo);
+        } else {
+            marcarInvalido(campo);
+        }
+    });
+
+    // 3. Select Institución
+    $("#IdInstitucion").on("change", function () {
+        let campo = $(this);
+        if (campo.val() !== "") {
+            marcarValido(campo);
+        } else {
+            marcarInvalido(campo);
+        }
+    });
+
+
+    // ============================
+    // ENVÍO AJAX
+    // ============================
+
+    $("#formRegistrarSede").submit(function (e) {
+        e.preventDefault();
+
+        let errores = [];
+
+        const tipo = $("#TipoSede");
+        const ciudad = $("#Ciudad");
+        const institucion = $("#IdInstitucion");
+
+        // Validaciones finales
+        if (tipo.val().length < 3 || !soloTexto(tipo.val())) {
+            errores.push("• El tipo de sede debe contener solo letras (mínimo 3 caracteres).");
+            marcarInvalido(tipo);
+        } else {
+            marcarValido(tipo);
+        }
+
+        if (ciudad.val().length < 3 || !soloTexto(ciudad.val())) {
+            errores.push("• La ciudad debe contener solo letras (mínimo 3 caracteres).");
+            marcarInvalido(ciudad);
+        } else {
+            marcarValido(ciudad);
+        }
+
+        if (institucion.val() === "") {
+            errores.push("• Debe seleccionar una institución.");
+            marcarInvalido(institucion);
+        } else {
+            marcarValido(institucion);
+        }
+
+        if (errores.length > 0) {
+            Swal.fire({
+                icon: "error",
+                title: "Error de validación",
+                html: "<div style='text-align:left;'>" + errores.join("<br>") + "</div>",
+                confirmButtonText: "OK",
+                confirmButtonColor: "#ef4444",
+            });
+            return;
+        }
+
+        // Loading
+        Swal.fire({
+            title: 'Registrando sede...',
+            html: 'Por favor espere',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        const btn = $(this).find("button[type='submit']");
+        const originalText = btn.html();
+        btn.prop("disabled", true);
+
+        $.ajax({
+            url: '../../Controller/ControladorSede.php',
+            type: "POST",
+            data: $(this).serialize() + "&accion=registrar",
+            dataType: "json",
+
+            success: function (response) {
+                Swal.close();
+
+                if (response.success) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "¡Registro Exitoso!",
+                        text: response.message,
+                        confirmButtonColor: "#10b981"
+                    }).then(() => {
+                        $("#formRegistrarSede")[0].reset();
+                        inicializarValidacion();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error en el Registro",
+                        text: response.message,
+                        confirmButtonColor: "#ef4444"
+                    });
+                }
+            },
+
+            error: function () {
+                Swal.close();
+                inicializarValidacion();
+
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Error de conexión con el servidor.",
+                    confirmButtonColor: "#ef4444"
+                });
+            },
+
+            complete: function () {
+                btn.html(originalText);
+                btn.prop("disabled", false);
+            }
+        });
     });
 });

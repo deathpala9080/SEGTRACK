@@ -15,7 +15,7 @@
             <div class="logo">Segtrack</div>
             <div class="nav-links">
                 <a href="../Administrador/instituto.php">Instituto</a>
-                <a href="../View/Bitacora.php">Sede</a>
+                <a href="../Administrador/sede.php">Sede</a>
                 <a href="../models/sede.php">Usuarios</a>
             </div>
         </div>

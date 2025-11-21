@@ -1,32 +1,19 @@
 <?php
+// App/View/Administrador/Sede.php
+
+session_start();
+
 require_once __DIR__ . '/../layouts/parte_superior.php';
-require_once __DIR__ . "/../../Controller/ControladorSede.php";
+// ATENCIÓN: Esta inclusión es SOLO para cargar las Instituciones en el <select>
+// La acción de REGISTRO POST (submit) se maneja directamente desde AJAX en ValidacionesSede.js
+require_once __DIR__ . "/../../Controller/ControladorSede.php"; 
 
 $controlador = new ControladorSede();
 $instituciones = $controlador->obtenerInstituciones();
 ?>
 
-<style>
-.input-valid {
-    border: 2px solid #28a745 !important;
-    box-shadow: 0 0 4px rgba(40, 167, 69, .5);
-}
-
-.input-invalid {
-    border: 2px solid #dc3545 !important;
-    box-shadow: 0 0 4px rgba(220, 53, 69, .5);
-}
-
-.label-valid {
-    color: #28a745 !important;
-    font-weight: 600;
-}
-
-.label-invalid {
-    color: #dc3545 !important;
-    font-weight: 600;
-}
-</style>
+<!-- Nota: Ya no se requieren las clases .input-valid/.label-valid en esta vista, 
+porque el JS ahora aplicará el estilo directamente (inline). -->
 
 <div class="container-fluid px-4 py-4">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -42,12 +29,13 @@ $instituciones = $controlador->obtenerInstituciones();
         </div>
 
         <div class="card-body">
-            <form id="formRegistrarSede" method="POST">
+            <!-- El método POST se omite, el envío es 100% AJAX -->
+            <form id="formRegistrarSede"> 
 
                 <div class="row">
 
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Nombre / Tipo de Sede *</label>
+                        <label for="TipoSede" class="form-label">Nombre / Tipo de Sede *</label>
                         <input type="text" id="TipoSede" name="TipoSede"
                             maxlength="30"
                             class="form-control border-primary shadow-sm"
@@ -55,7 +43,7 @@ $instituciones = $controlador->obtenerInstituciones();
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Ciudad *</label>
+                        <label for="Ciudad" class="form-label">Ciudad *</label>
                         <input type="text" id="Ciudad" name="Ciudad"
                             maxlength="30"
                             class="form-control border-primary shadow-sm"
@@ -65,7 +53,7 @@ $instituciones = $controlador->obtenerInstituciones();
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Institución Asociada *</label>
+                    <label for="IdInstitucion" class="form-label">Institución Asociada *</label>
                     <select name="IdInstitucion" id="IdInstitucion"
                         class="form-control border-primary shadow-sm">
                         <option value="">Seleccione...</option>
@@ -91,7 +79,7 @@ $instituciones = $controlador->obtenerInstituciones();
 </div>
 
 <?php require_once __DIR__ . '/../layouts/parte_inferior.php'; ?>
-
-<script src="../../../Public/js/javascript/session_check.js"></script>
+<script src="../../../Public/vendor/jquery/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="../../../Public/js/javascript/js/ValidacionesSede.js"></script>
+
