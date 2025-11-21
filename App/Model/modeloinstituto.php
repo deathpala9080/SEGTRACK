@@ -1,5 +1,7 @@
-modeloinstituto.php
 <?php
+// App/Model/modeloinstituto.php
+
+// Ruta a la conexión (sube a /App, baja a /Core)
 require_once __DIR__ . '/../Core/conexion.php';
 
 class ModeloInstituto
@@ -8,94 +10,43 @@ class ModeloInstituto
 
     public function __construct()
     {
-        $conexionObj = new Conexion();
-        $this->conexion = $conexionObj->getConexion();
+        // Usamos un try-catch para capturar el fallo de conexión
+        try {
+            $conexionObj = new Conexion(); 
+            $this->conexion = $conexionObj->getConexion();
+        } catch (\PDOException $e) {
+            // Este catch nunca se disparará si die() está en Conexion.php
+            // Pero es buena práctica.
+            throw new Exception("Fallo al inicializar el modelo. Verifique la clase Conexion.");
+        }
     }
 
-    public function generarNit()
+    // ** FUNCIÓN CLAVE DE INSERCIÓN **
+    public function insertarInstituto(array $datos)
     {
         try {
-            $sql = "SELECT Nit_Codigo FROM institucion ORDER BY IdInstitucion DESC LIMIT 1";
+            $sql = "INSERT INTO institucion (NombreInstitucion, Nit_Codigo, TipoInstitucion, EstadoInstitucion) 
+                    VALUES (:nombre, :nit, :tipo, :estado)";
             $stmt = $this->conexion->prepare($sql);
+            
+            $stmt->bindParam(':nombre', $datos['NombreInstitucion']);
+            $stmt->bindParam(':nit', $datos['Nit_Codigo']);
+            $stmt->bindParam(':tipo', $datos['TipoInstitucion']);
+            $stmt->bindParam(':estado', $datos['EstadoInstitucion']);
+            
             $stmt->execute();
-            $ultimo = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($ultimo && !empty($ultimo['Nit_Codigo'])) {
-                // Separar la parte numérica del NIT
-                $partes = explode('-', $ultimo['Nit_Codigo']);
-                $numero = isset($partes[1]) ? intval($partes[1]) + 1 : 1;
-            } else {
-                $numero = 1;
+            return ['error' => false, 'mensaje' => 'Institución "' . $datos['NombreInstitucion'] . '" registrada con éxito.'];
+
+        } catch (PDOException $e) {
+            // Manejar errores de SQL como duplicados
+            if ($e->getCode() == 23000) { 
+                 return ['error' => true, 'mensaje' => 'Error: El NIT/Código ' . $datos['Nit_Codigo'] . ' ya se encuentra registrado.'];
             }
-
-            // De esta forma nos aseguramos que el NIT no se repita
-            do {
-                $nit = "900123456-$numero";
-                $check = $this->conexion->prepare("SELECT COUNT(*) FROM institucion WHERE Nit_Codigo = :nit");
-                $check->bindParam(':nit', $nit);
-                $check->execute();
-                $existe = $check->fetchColumn();
-                $numero++;
-            } while ($existe > 0);
-
-            return $nit;
-
-        } catch (PDOException $e) {
-            return "900123456-1";
+            return ['error' => true, 'mensaje' => 'Error en la base de datos: ' . $e->getMessage()];
         }
-    }
-
-
-    public function insertarInstituto($datos)
-    {
-        try {
-            // Generar NIT si no viene desde el controlador
-            if (!isset($datos['Nit_Codigo'])) {
-                $datos['Nit_Codigo'] = $this->generarNit();
-            }
-
-            $sql = "INSERT INTO institucion 
-                (NombreInstitucion, Nit_Codigo, TipoInstitucion, EstadoInstitucion)
-                VALUES (:NombreInstitucion, :Nit_Codigo, :TipoInstitucion, :EstadoInstitucion)";
-
-            $stmt = $this->conexion->prepare($sql);
-            $stmt->bindParam(':NombreInstitucion', $datos['NombreInstitucion']);
-            $stmt->bindParam(':Nit_Codigo', $datos['Nit_Codigo']); // ahora coincide
-            $stmt->bindParam(':TipoInstitucion', $datos['TipoInstitucion']);
-            $stmt->bindParam(':EstadoInstitucion', $datos['EstadoInstitucion']);
-            $stmt->execute();
-
-            return ['error' => false, 'mensaje' => "✅ Institución registrada correctamente. NIT: {$datos['Nit_Codigo']}"];
-        } catch (PDOException $e) {
-            return ['error' => true, 'mensaje' => '❌ Error al registrar: ' . $e->getMessage()];
-        }
-    }
-    public function obtenerTodasLasInstituciones()
-    {
-        try {
-            $sql = "SELECT IdInstitucion, NombreInstitucion, TipoInstitucion, EstadoInstitucion 
-                FROM institucion 
-                ORDER BY TipoInstitucion ASC";
-            $stmt = $this->conexion->prepare($sql);
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            return [];
-        }
-    }
-
-
-    public function listarInstitutos()
-    {
-        try {
-            $sql = "SELECT * FROM institucion ORDER BY IdInstitucion DESC";
-            $stmt = $this->conexion->prepare($sql);
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
-        }
-    }
+    } 
+    
+    // ... (El resto de tus funciones de búsqueda, listar, eliminar) ...
 }
-
 ?>

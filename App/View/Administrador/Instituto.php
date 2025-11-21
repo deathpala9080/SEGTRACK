@@ -1,19 +1,9 @@
 <?php
 session_start();
 
+// Carga la parte superior del layout
 require_once __DIR__ . '/../layouts/parte_superior_supervisor.php';
 ?>
-
-<style>
-    /* Estilos para validación en tiempo real */
-    .campo-valido {
-        border: 2px solid #10b981 !important;
-    }
-    
-    .campo-invalido {
-        border: 2px solid #ef4444 !important;
-    }
-</style>
 
 <div class="container-fluid px-4 py-4">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -32,7 +22,7 @@ require_once __DIR__ . '/../layouts/parte_superior_supervisor.php';
                 <i class="fas fa-info-circle me-2"></i>Recuerda estos campos son obligatorios con la regla de que verde es aprobado y rojo reprobado.
             </div>
             
-            <form id="formInstituto" method="POST" action="../../Controller/ControladorInstituto.php">
+            <form id="formInstituto"> 
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="NombreInstitucion" class="form-label">Nombre de la Institución</label>
@@ -52,9 +42,6 @@ require_once __DIR__ . '/../layouts/parte_superior_supervisor.php';
                             <option value="">Seleccione tipo...</option>
                             <option value="Universidad">Universidad</option>
                             <option value="Colegio">Colegio</option>
-                            <option value="Empresa">Empresa</option>
-                            <option value="ONG">ONG</option>
-                            <option value="Hospital">Hospital</option>
                             <option value="Otro">Otro</option>
                         </select>
                     </div>
@@ -78,10 +65,10 @@ require_once __DIR__ . '/../layouts/parte_superior_supervisor.php';
     </div>
 </div>
 
-<?php require_once __DIR__ . '/../layouts/parte_inferior_supervisor.php'; ?>
-
-<!-- Dependencias JS -->
-<script src="../../../Public/vendor/jquery/jquery.min.js"></script>
+<?php 
+require_once __DIR__ . '/../layouts/parte_inferior_supervisor.php'; 
+?>
+// ... (casi al final de Instituto.php)
+<script src="../../../Public/vendor/jquery/jquery.min.js"></script> // <-- RUTA RELATIVA DIFERENTE
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<script src="../../../Public/js/javascript/js/Instituto.js"></script>
+<script src="../../../Public/js/javascript/js/Instituto.js"></script> // <-- RUTA RELATIVA DIFERENTE
