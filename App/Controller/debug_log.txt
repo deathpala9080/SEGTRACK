@@ -1,0 +1,198 @@
+2025-11-22 14:52:20 === INICIO ===
+POST recibido:
+{
+    "CargoFuncionario": "Visitante",
+    "NombreFuncionario": "luisa  ferias domingez",
+    "IdSede": "18",
+    "TelefonoFuncionario": "3124558759",
+    "DocumentoFuncionario": "1002214541",
+    "CorreoFuncionario": "pasachoa2002@gmail.com",
+    "accion": "registrar"
+}
+Conexión cargada
+Conexión verificada como instancia de PDO
+ERROR FINAL: Librería phpqrcode no encontrada: C:\xampp\htdocs\SEGTRACK\App\Controller/../Libraries/libs/phpqrcode/qrlib.php
+2025-11-22 14:59:02 === INICIO ===
+POST recibido:
+{
+    "CargoFuncionario": "Personal Seguridad",
+    "NombreFuncionario": "luisa  ferias domingez",
+    "IdSede": "18",
+    "TelefonoFuncionario": "3124558759",
+    "DocumentoFuncionario": "1002214541",
+    "CorreoFuncionario": "pasachoa2002@gmail.com",
+    "accion": "registrar"
+}
+Conexión cargada
+Conexión verificada como instancia de PDO
+ERROR FINAL: Librería phpqrcode no encontrada: C:\xampp\htdocs\SEGTRACK\App\Controller/../Libraries/libs/phpqrcode/qrlib.php
+ñ2025-11-22 15:20:38 === INICIO ===
+POST recibido:
+{
+    "CargoFuncionario": "Personal Seguridad",
+    "NombreFuncionario": "luisa  ferias domingez",
+    "IdSede": "17",
+    "TelefonoFuncionario": "3124558759",
+    "DocumentoFuncionario": "1002214541",
+    "CorreoFuncionario": "pasachoa2002@gmail.com",
+    "accion": "registrar"
+}
+Conexión cargada
+Conexión verificada como instancia de PDO
+ERROR FINAL: Librería phpqrcode no encontrada: C:\xampp\htdocs\SEGTRACK\App\Controller/../Libraries/qrlib.php
+2025-11-22 15:23:53 === INICIO ===
+POST recibido:
+{
+    "CargoFuncionario": "Personal Seguridad",
+    "NombreFuncionario": "luisa  ferias domingez",
+    "IdSede": "17",
+    "TelefonoFuncionario": "3124558759",
+    "DocumentoFuncionario": "1002214541",
+    "CorreoFuncionario": "pasachoa2002@gmail.com",
+    "accion": "registrar"
+}
+Conexión cargada
+Conexión verificada como instancia de PDO
+Librería QR cargada
+Modelo cargado
+Acción: registrar
+registrarFuncionario llamado
+Llamando a RegistrarFuncionario en el modelo
+Resultado del modelo: {"success":true,"id":"33"}
+Registro exitoso, ID: 33
+Generando QR para funcionario ID: 33
+Ruta carpeta QR: C:\xampp\htdocs\SEGTRACK\Public/qr/Qr_Func
+Carpeta QR ya existe
+Intentando crear QR en: C:\xampp\htdocs\SEGTRACK\Public/qr/Qr_Func/QR-FUNC-33-6921c77949f46.png
+2025-11-22 15:25:20 === INICIO ===
+POST recibido:
+{
+    "CargoFuncionario": "Personal Seguridad",
+    "NombreFuncionario": "luisa  ferias domingez",
+    "IdSede": "17",
+    "TelefonoFuncionario": "3124558759",
+    "DocumentoFuncionario": "1002214541",
+    "CorreoFuncionario": "pasachoa2002@gmail.com",
+    "accion": "registrar"
+}
+Conexión cargada
+Conexión verificada como instancia de PDO
+Librería QR cargada
+Modelo cargado
+Acción: registrar
+registrarFuncionario llamado
+Llamando a RegistrarFuncionario en el modelo
+Resultado del modelo: {"success":true,"id":"34"}
+Registro exitoso, ID: 34
+Generando QR para funcionario ID: 34
+Ruta carpeta QR: C:\xampp\htdocs\SEGTRACK\Public/qr/Qr_Func
+Carpeta QR ya existe
+Intentando crear QR en: C:\xampp\htdocs\SEGTRACK\Public/qr/Qr_Func/QR-FUNC-34-6921c7d027923.png
+2025-11-22 15:26:11 === INICIO ===
+POST recibido:
+{
+    "CargoFuncionario": "Personal Seguridad",
+    "NombreFuncionario": "luisa  ferias domingez",
+    "IdSede": "17",
+    "TelefonoFuncionario": "3124558759",
+    "DocumentoFuncionario": "1002214541",
+    "CorreoFuncionario": "pasachoa2002@gmail.com",
+    "accion": "registrar"
+}
+Conexión cargada
+Conexión verificada como instancia de PDO
+Librería QR cargada
+Modelo cargado
+Acción: registrar
+registrarFuncionario llamado
+Llamando a RegistrarFuncionario en el modelo
+Resultado del modelo: {"success":true,"id":"35"}
+Registro exitoso, ID: 35
+Generando QR para funcionario ID: 35
+Ruta carpeta QR: C:\xampp\htdocs\SEGTRACK\Public/qr/Qr_Func
+Carpeta QR ya existe
+Intentando crear QR en: C:\xampp\htdocs\SEGTRACK\Public/qr/Qr_Func/QR-FUNC-35-6921c8040412b.png
+2025-11-22 15:37:43 === INICIO ===
+POST recibido:
+{
+    "CargoFuncionario": "Funcionario Institucion",
+    "NombreFuncionario": "luisa  ferias domingez",
+    "IdSede": "17",
+    "TelefonoFuncionario": "3124558759",
+    "DocumentoFuncionario": "1002214541",
+    "CorreoFuncionario": "pasachoa2002@gmail.com",
+    "accion": "registrar"
+}
+Conexión cargada
+Conexión verificada como instancia de PDO
+ERROR FINAL: Librería phpqrcode no encontrada: C:\xampp\htdocs\SEGTRACK\App\Controller/../../Libraries/phpqrcode/qrlib.php
+2025-11-22 15:42:19 === INICIO ===
+POST recibido:
+{
+    "CargoFuncionario": "Funcionario Institucion",
+    "NombreFuncionario": "luisa  ferias domingez",
+    "IdSede": "17",
+    "TelefonoFuncionario": "3124558759",
+    "DocumentoFuncionario": "1002214541",
+    "CorreoFuncionario": "pasachoa2002@gmail.com",
+    "accion": "registrar"
+}
+Conexión cargada
+Conexión verificada como instancia de PDO
+ERROR FINAL: Librería phpqrcode no encontrada: C:\xampp\htdocs\SEGTRACK\App\Controller/../../Libraries/phpqrcode/qrlib.php
+2025-11-22 15:44:07 === INICIO ===
+POST recibido:
+{
+    "CargoFuncionario": "Personal Seguridad",
+    "NombreFuncionario": "luisa  ferias domingez",
+    "IdSede": "18",
+    "TelefonoFuncionario": "3124558759",
+    "DocumentoFuncionario": "1002214541",
+    "CorreoFuncionario": "pasachoa2002@gmail.com",
+    "accion": "registrar"
+}
+Conexión cargada
+Conexión verificada como instancia de PDO
+ERROR FINAL: Librería phpqrcode no encontrada: C:\xampp\htdocs\SEGTRACK\App\Controller/../../Libraries/phpqrcode/qrlib.php
+2025-11-22 15:44:49 === INICIO ===
+POST recibido:
+{
+    "CargoFuncionario": "Personal Seguridad",
+    "NombreFuncionario": "luisa  ferias domingez",
+    "IdSede": "18",
+    "TelefonoFuncionario": "3124558759",
+    "DocumentoFuncionario": "1002214541",
+    "CorreoFuncionario": "pasachoa2002@gmail.com",
+    "accion": "registrar"
+}
+Conexión cargada
+Conexión verificada como instancia de PDO
+ERROR FINAL: Librería phpqrcode no encontrada: C:\xampp\htdocs\SEGTRACK\App\Controller/../../Libraries/phpqrcode/qrlib.php
+2025-11-22 15:45:19 === INICIO ===
+POST recibido:
+{
+    "CargoFuncionario": "Personal Seguridad",
+    "NombreFuncionario": "luisa  ferias domingez",
+    "IdSede": "17",
+    "TelefonoFuncionario": "3124558759",
+    "DocumentoFuncionario": "1002214541",
+    "CorreoFuncionario": "pasachoa2002@gmail.com",
+    "accion": "registrar"
+}
+Conexión cargada
+Conexión verificada como instancia de PDO
+ERROR FINAL: Librería phpqrcode no encontrada: C:\xampp\htdocs\SEGTRACK\App\Controller/../../Libraries/phpqrcode/qrlib.php
+2025-11-22 15:45:31 === INICIO ===
+POST recibido:
+{
+    "CargoFuncionario": "Personal Seguridad",
+    "NombreFuncionario": "luisa  ferias domingez",
+    "IdSede": "17",
+    "TelefonoFuncionario": "3124558759",
+    "DocumentoFuncionario": "1002214541",
+    "CorreoFuncionario": "pasachoa2002@gmail.com",
+    "accion": "registrar"
+}
+Conexión cargada
+Conexión verificada como instancia de PDO
+ERROR FINAL: Librería phpqrcode no encontrada: C:\xampp\htdocs\SEGTRACK\App\Controller/../../Libraries/phpqrcode/qrlib.php

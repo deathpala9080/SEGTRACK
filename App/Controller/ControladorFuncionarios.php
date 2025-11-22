@@ -1,11 +1,11 @@
 <?php
+echo __DIR__;
 error_reporting(E_ALL);
-ini_set('display_errors', 0);
+ini_set('display_errors', 1);
 ini_set('log_errors', 1);
 ini_set('error_log', __DIR__ . '/error_log.txt');
 
 ob_start();
-
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 
@@ -15,7 +15,7 @@ try {
     file_put_contents(__DIR__ . '/debug_log.txt', "POST recibido:\n" . json_encode($_POST, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . "\n", FILE_APPEND);
 
     // ✅ Cargar archivo de conexión
-    $ruta_conexion = __DIR__ . '/../../Core/conexion.php';
+    $ruta_conexion = __DIR__ . '/../Core/conexion.php';
     if (!file_exists($ruta_conexion)) {
         throw new Exception("Archivo de conexión no encontrado: $ruta_conexion");
     }
@@ -37,7 +37,8 @@ try {
     file_put_contents(__DIR__ . '/debug_log.txt', "Conexión verificada como instancia de PDO\n", FILE_APPEND);
 
     // ✅ Verificar librería QR
-    $ruta_qrlib = __DIR__ . '/../../libs/phpqrcode/qrlib.php';
+    $ruta_qrlib = __DIR__ . '/../../Libraries/phpqrcode/qrlib.php';
+
     if (!file_exists($ruta_qrlib)) {
         throw new Exception("Librería phpqrcode no encontrada: $ruta_qrlib");
     }
@@ -45,35 +46,39 @@ try {
     file_put_contents(__DIR__ . '/debug_log.txt', "Librería QR cargada\n", FILE_APPEND);
 
     // ✅ Verificar modelo
-    $ruta_modelo = __DIR__ . "/../../model/sede_institucion_funcionario_usuario/ModeloFuncionarios.php";
+    $ruta_modelo = __DIR__ . "/../Model/ModeloFuncionarios.php";
     if (!file_exists($ruta_modelo)) {
         throw new Exception("Modelo no encontrado: $ruta_modelo");
     }
     require_once $ruta_modelo;
     file_put_contents(__DIR__ . '/debug_log.txt', "Modelo cargado\n", FILE_APPEND);
 
-    class ControladorFuncionario {
+    class ControladorFuncionario
+    {
         private $modelo;
 
-        public function __construct($conexion) {
+        public function __construct($conexion)
+        {
             $this->modelo = new ModeloFuncionario($conexion);
         }
 
-        private function campoVacio($campo): bool {
+        private function campoVacio($campo): bool
+        {
             return !isset($campo) || $campo === '' || trim($campo) === '';
         }
 
-        private function generarQR(int $idFuncionario, string $nombre, string $documento): ?string {
+        private function generarQR(int $idFuncionario, string $nombre, string $documento): ?string
+        {
             try {
                 file_put_contents(__DIR__ . '/debug_log.txt', "Generando QR para funcionario ID: $idFuncionario\n", FILE_APPEND);
 
                 // 🔥 RUTA CORREGIDA: Desde Controller/sede_institucion_funcionario_usuario/ hacia raíz
                 // __DIR__ está en: SEGTRACK/Controller/sede_institucion_funcionario_usuario/
                 // Necesitamos ir a: SEGTRACK/qr/
-                $rutaCarpeta = realpath(__DIR__ . '/../../') . '/qr';
-                
+                $rutaCarpeta = realpath(__DIR__ . '/../../Public') . '/qr/Qr_Func';
+
                 file_put_contents(__DIR__ . '/debug_log.txt', "Ruta carpeta QR: $rutaCarpeta\n", FILE_APPEND);
-                
+
                 if (!file_exists($rutaCarpeta)) {
                     mkdir($rutaCarpeta, 0777, true);
                     file_put_contents(__DIR__ . '/debug_log.txt', "Carpeta QR creada: $rutaCarpeta\n", FILE_APPEND);
@@ -103,7 +108,8 @@ try {
             }
         }
 
-        public function registrarFuncionario(array $datos): array {
+        public function registrarFuncionario(array $datos): array
+        {
             file_put_contents(__DIR__ . '/debug_log.txt', "registrarFuncionario llamado\n", FILE_APPEND);
 
             // 🔥 Limpiar y validar longitud de campos
@@ -137,16 +143,16 @@ try {
 
             try {
                 file_put_contents(__DIR__ . '/debug_log.txt', "Llamando a RegistrarFuncionario en el modelo\n", FILE_APPEND);
-                
-                $resultado = $this->modelo->RegistrarFuncionario($cargo, $nombre, (int)$sede, (int)$telefono, (int)$documento, $correo);
-                
+
+                $resultado = $this->modelo->RegistrarFuncionario($cargo, $nombre, (int) $sede, (int) $telefono, (int) $documento, $correo);
+
                 // 🔥 CAMBIO CRÍTICO: Registrar el resultado completo
                 file_put_contents(__DIR__ . '/debug_log.txt', "Resultado del modelo: " . json_encode($resultado) . "\n", FILE_APPEND);
 
                 if ($resultado['success']) {
                     $idFuncionario = $resultado['id'];
                     file_put_contents(__DIR__ . '/debug_log.txt', "Registro exitoso, ID: $idFuncionario\n", FILE_APPEND);
-                    
+
                     $rutaQR = $this->generarQR($idFuncionario, $nombre, $documento);
 
                     if ($rutaQR) {
@@ -170,7 +176,8 @@ try {
             }
         }
 
-        public function actualizarFuncionario(int $id, array $datos): array {
+        public function actualizarFuncionario(int $id, array $datos): array
+        {
             file_put_contents(__DIR__ . '/debug_log.txt', "actualizarFuncionario llamado con ID: $id\n", FILE_APPEND);
 
             try {
@@ -196,7 +203,7 @@ try {
     if ($accion === 'registrar') {
         $resultado = $controlador->registrarFuncionario($_POST);
     } elseif ($accion === 'actualizar') {
-        $id = (int)($_POST['id'] ?? 0);
+        $id = (int) ($_POST['id'] ?? 0);
         if ($id > 0) {
             $datos = [
                 'CargoFuncionario' => $_POST['CargoFuncionario'],
@@ -221,10 +228,10 @@ try {
 
 } catch (Exception $e) {
     ob_end_clean();
-    
+
     $error = $e->getMessage();
     file_put_contents(__DIR__ . '/debug_log.txt', "ERROR FINAL: $error\n", FILE_APPEND);
-    
+
     echo json_encode([
         'success' => false,
         'message' => 'Error del servidor: ' . $error,

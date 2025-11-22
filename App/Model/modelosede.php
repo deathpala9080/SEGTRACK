@@ -54,6 +54,24 @@ class ModeloSede {
             return [];
         }
     }
+    // 🔥 AGREGA ESTE MÉTODO en tu ModeloSede.php
 
-    // ... (Mantener las demás funciones CRUD) ...
+/**
+ * Obtener todas las sedes para select
+ * @return array
+ */
+public function obtenerSedes() {
+    try {
+        $query = "SELECT IdSede, TipoSede as NombreSede, Ciudad 
+                  FROM sede 
+                  ORDER BY TipoSede ASC";
+        
+        $stmt = $this->conexion->query($query);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+    } catch (PDOException $e) {
+        error_log("Error al obtener sedes: " . $e->getMessage());
+        return [];
+    }
+}
 }

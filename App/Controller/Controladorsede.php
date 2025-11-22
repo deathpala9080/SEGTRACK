@@ -18,6 +18,14 @@ class ControladorSede {
         return $this->modelo->obtenerInstituciones();
     }
 
+    /**
+     * Obtener todas las sedes para llenar select
+     * @return array
+     */
+    public function obtenerSedes() {
+        return $this->modelo->obtenerSedes();
+    }
+
     public function registrarSede($datos) {
 
         $tipoSede = trim($datos['TipoSede'] ?? '');
