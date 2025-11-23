@@ -5,7 +5,7 @@ require_once __DIR__ . '/../layouts/parte_superior.php';
 // Cargar sedes para el select
 require_once __DIR__ . "/../../Controller/ControladorSede.php"; 
 $controladorSede = new ControladorSede();
-$sedes = $controladorSede->obtenerSedes(); // Necesitamos crear este método
+$sedes = $controladorSede->obtenerSedes();
 ?>
 
 <div class="container-fluid px-4 py-4">
@@ -94,6 +94,17 @@ $sedes = $controladorSede->obtenerSedes(); // Necesitamos crear este método
             </form>
         </div>
     </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header bg-light">
+            <h6 class="m-0 font-weight-bold text-primary">Información Adicional</h6>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info mb-0">
+                <i class="fas fa-info-circle me-2"></i> El código QR se generará automáticamente después de guardar los datos del funcionario.
+            </div>
+        </div>
+    </div>
 </div>
 
 <?php require_once __DIR__ . '/../layouts/parte_inferior.php'; ?>
@@ -175,7 +186,7 @@ $(document).ready(function () {
         console.log("Enviando datos:", formData);
 
         $.ajax({
-            url: "../../Controller/controladorFuncionarios.php",
+            url: "../../Controller/ControladorFuncionarios.php",
             type: "POST",
             data: formData,
             dataType: "json",
