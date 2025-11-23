@@ -65,9 +65,7 @@ require_once __DIR__ . '/../layouts/parte_superior_supervisor.php';
     </div>
 </div>
 
-<?php 
-require_once __DIR__ . '/../layouts/parte_inferior_supervisor.php'; 
-?>
+<?php require_once __DIR__ . '/../layouts/parte_inferior_supervisor.php'; ?>
 // ... (casi al final de Instituto.php)
 <script src="../../../Public/vendor/jquery/jquery.min.js"></script> // <-- RUTA RELATIVA DIFERENTE
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

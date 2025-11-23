@@ -230,11 +230,33 @@
 let funcionarioIdEditar = null;
 
 // 🔥 FUNCIÓN CORREGIDA PARA VER QR
+// CÓDIGO CORREGIDO (Asumiendo que verQR está en FuncionarioLista.php)
+// Debes asegurarte de que esta función está en tu código, probablemente en un archivo JS aparte o en FuncionarioLista.php.
+
+// CÓDIGO CORREGIDO (Asumiendo que verQR está en FuncionarioLista.php)
+// Debes asegurarte de que esta función está en tu código, probablemente en un archivo JS aparte o en FuncionarioLista.php.
+
 function verQR(nombreArchivo, idFuncionario) {
-    console.log("Nombre archivo recibido:", nombreArchivo);
-    
-    // Construir la ruta correcta desde View hacia qr
-    const rutaCompleta = '../qr/' + nombreArchivo;
+    // 1. CORRECCIÓN DE LA RUTA: Se añade el separador final '/'
+    const rutaBasePublica = '../../../Public/qr/Qr_Func/'; 
+
+    const rutaCompleta = rutaBasePublica + nombreArchivo;
+
+    // ... Lógica para mostrar el modal con Swal.fire o el modal que uses
+    // Asegúrate de que el código que genera la imagen en el modal use rutaCompleta.
+
+    Swal.fire({
+        // ... (resto de la configuración del modal)
+        imageUrl: rutaCompleta, // <-- Asegúrate de usar esta variable aquí
+        // ...
+    });
+}
+    // =========================================================================
+    // 🚩 CORRECCIÓN CRÍTICA: Se añade la barra '/' entre la carpeta y el archivo.
+    // La ruta debe ser: '../../Public/qr/Qr_Func/' + nombreArchivo;
+    // =========================================================================
+    const rutaBasePublica = '../../Public/qr/Qr_Func';
+    const rutaCompleta = rutaBasePublica + nombreArchivo;
     
     console.log("Ruta completa construida:", rutaCompleta);
     
@@ -243,13 +265,14 @@ function verQR(nombreArchivo, idFuncionario) {
     $('#rutaDebug').text('Ruta: ' + rutaCompleta);
     $('#btnDescargarQR').attr('href', rutaCompleta).attr('download', 'QR-Funcionario-' + idFuncionario + '.png');
     
-    // Verificar si la imagen se carga correctamente
-    $('#qrImagen').on('error', function() {
+    // Verificar si la imagen se carga correctamente (debería funcionar ahora)
+    $('#qrImagen').off('error').on('error', function() {
         console.error("Error al cargar la imagen desde:", rutaCompleta);
+        // Usar SweetAlert2 o un modal más amigable si lo tienes, sino alert
         alert("No se pudo cargar la imagen QR. Verifica la ruta: " + rutaCompleta);
     });
     
-    $('#qrImagen').on('load', function() {
+    $('#qrImagen').off('load').on('load', function() {
         console.log("Imagen cargada exitosamente");
     });
     
@@ -282,7 +305,7 @@ $('#btnGuardarCambios').click(function() {
     };
 
     $.ajax({
-        url: '../Controller/sede_institucion_funcionario_usuario/ControladorFuncionarios.php',
+        url: '../../Controller/ControladorFuncionarios.php',
         type: 'POST',
         data: formData,
         dataType: 'json',
