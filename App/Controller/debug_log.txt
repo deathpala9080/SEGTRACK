@@ -500,3 +500,111 @@ INSERT exitoso, ID generado: 54
 Generando QR para funcionario ID: 54
 QR generado exitosamente: C:\xampp\htdocs\SEGTRACK\App\Controller/../../Public/qr/Qr_Func/QR-FUNC-54-692309c9a4a5f.png
 Respuesta final: {"success":true,"message":"Funcionario registrado correctamente con ID: 54","data":{"IdFuncionario":"54","QrCodigoFuncionario":"qr\/Qr_Func\/QR-FUNC-54-692309c9a4a5f.png"}}
+2025-11-23 14:22:39 === INICIO ===
+POST recibido:
+{
+    "accion": "actualizar",
+    "id": "54",
+    "cargo": "Personal Seguridad",
+    "nombre": "maria de tancur",
+    "sede": "35",
+    "telefono": "30002938823",
+    "documento": "13999823234",
+    "correo": "mariacustodia@gmail.com"
+}
+Conexión cargada
+Conexión verificada como PDO
+Librería QR cargada
+Modelo cargado
+Acción: actualizar
+actualizarFuncionario llamado con ID: 54
+Datos a actualizar: {"CargoFuncionario":"Personal Seguridad","NombreFuncionario":"maria de tancur","IdSede":35,"TelefonoFuncionario":30002938823,"DocumentoFuncionario":13999823234,"CorreoFuncionario":"mariacustodia@gmail.com"}
+Funcionario actualizado exitosamente
+Respuesta final: {"success":true,"message":"Funcionario actualizado correctamente"}
+2025-11-23 14:42:43 === INICIO ===
+POST recibido:
+{
+    "CargoFuncionario": "Personal Seguridad",
+    "NombreFuncionario": "Daya estupiñan",
+    "IdSede": "17",
+    "TelefonoFuncionario": "32313213132",
+    "DocumentoFuncionario": "32131321321321321321",
+    "CorreoFuncionario": "dayana@gmail.com",
+    "accion": "registrar"
+}
+Conexión cargada
+Conexión verificada como PDO
+Librería QR cargada
+Modelo cargado
+Acción: registrar
+registrarFuncionario llamado
+=== MODELO: registrarFuncionario ===
+Cargo: Personal Seguridad, Nombre: Daya estupiñan, Sede: 17, Tel: 32313213132, Doc: 9223372036854775807
+Conexión OK, preparando SQL
+SQL preparado: INSERT INTO funcionario 
+                    (CargoFuncionario, NombreFuncionario, IdSede, TelefonoFuncionario, DocumentoFuncionario, CorreoFuncionario, QrCodigoFuncionario)
+                    VALUES (:cargo, :nombre, :sede, :telefono, :documento, :correo, '')
+Parámetros: {":cargo":"Personal Seguridad",":nombre":"Daya estupi\u00f1an",":sede":17,":telefono":32313213132,":documento":9223372036854775807,":correo":"dayana@gmail.com"}
+Resultado execute: true
+INSERT exitoso, ID generado: 55
+Generando QR para funcionario ID: 55
+QR generado exitosamente: C:\xampp\htdocs\SEGTRACK\App\Controller/../../Public/qr/Qr_Func/QR-FUNC-55-69230f5415aea.png
+Respuesta final: {"success":true,"message":"Funcionario registrado correctamente con ID: 55","data":{"IdFuncionario":"55","QrCodigoFuncionario":"qr\/Qr_Func\/QR-FUNC-55-69230f5415aea.png"}}
+2025-11-23 15:07:03 === INICIO ===
+POST recibido:
+{
+    "CargoFuncionario": "Personal Seguridad",
+    "NombreFuncionario": "lopez sur",
+    "IdSede": "35",
+    "TelefonoFuncionario": "3213698564",
+    "DocumentoFuncionario": "45454541244",
+    "CorreoFuncionario": "lopez@gmail.com",
+    "accion": "registrar"
+}
+Conexión cargada
+Conexión verificada como PDO
+Librería QR cargada
+Modelo cargado
+Acción: registrar
+registrarFuncionario llamado
+=== MODELO: registrarFuncionario ===
+Cargo: Personal Seguridad, Nombre: lopez sur, Sede: 35, Tel: 3213698564, Doc: 45454541244
+Conexión OK, preparando SQL
+SQL preparado: INSERT INTO funcionario 
+                    (CargoFuncionario, NombreFuncionario, IdSede, TelefonoFuncionario, DocumentoFuncionario, CorreoFuncionario, QrCodigoFuncionario)
+                    VALUES (:cargo, :nombre, :sede, :telefono, :documento, :correo, '')
+Parámetros: {":cargo":"Personal Seguridad",":nombre":"lopez sur",":sede":35,":telefono":3213698564,":documento":45454541244,":correo":"lopez@gmail.com"}
+Resultado execute: true
+INSERT exitoso, ID generado: 56
+Generando QR para funcionario ID: 56
+QR generado exitosamente: C:\xampp\htdocs\SEGTRACK\App\Controller/../../Public/qr/Qr_Func/QR-FUNC-56-6923150783014.png
+Respuesta final: {"success":true,"message":"Funcionario registrado correctamente con ID: 56","data":{"IdFuncionario":"56","QrCodigoFuncionario":"qr\/Qr_Func\/QR-FUNC-56-6923150783014.png"}}
+2025-11-23 15:08:00 === INICIO ===
+POST recibido:
+{
+    "CargoFuncionario": "Funcionario Institucion",
+    "NombreFuncionario": "cristobal",
+    "IdSede": "34",
+    "TelefonoFuncionario": "3333333333",
+    "DocumentoFuncionario": "33333333333",
+    "CorreoFuncionario": "cristobal1645@gmail.com",
+    "accion": "registrar"
+}
+Conexión cargada
+Conexión verificada como PDO
+Librería QR cargada
+Modelo cargado
+Acción: registrar
+registrarFuncionario llamado
+=== MODELO: registrarFuncionario ===
+Cargo: Funcionario Institucion, Nombre: cristobal, Sede: 34, Tel: 3333333333, Doc: 33333333333
+Conexión OK, preparando SQL
+SQL preparado: INSERT INTO funcionario 
+                    (CargoFuncionario, NombreFuncionario, IdSede, TelefonoFuncionario, DocumentoFuncionario, CorreoFuncionario, QrCodigoFuncionario)
+                    VALUES (:cargo, :nombre, :sede, :telefono, :documento, :correo, '')
+Parámetros: {":cargo":"Funcionario Institucion",":nombre":"cristobal",":sede":34,":telefono":3333333333,":documento":33333333333,":correo":"cristobal1645@gmail.com"}
+Resultado execute: true
+INSERT exitoso, ID generado: 57
+Generando QR para funcionario ID: 57
+QR generado exitosamente: C:\xampp\htdocs\SEGTRACK\App\Controller/../../Public/qr/Qr_Func/QR-FUNC-57-69231540474de.png
+Respuesta final: {"success":true,"message":"Funcionario registrado correctamente con ID: 57","data":{"IdFuncionario":"57","QrCodigoFuncionario":"qr\/Qr_Func\/QR-FUNC-57-69231540474de.png"}}
