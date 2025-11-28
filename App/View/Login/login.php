@@ -14,11 +14,9 @@
         <div class="navbar">
             <div class="logo">Segtrack</div>
             <div class="nav-links">
-                <a href="../Administrador/instituto.php">Instituto</a>
-                <a href="../Administrador/sede.php">Sede</a>
-                <a href="../Login/Usuario.php">Usuarios</a>
-                <a href="../PersonalSeguridad/Funcionario.php">Funcionario</a>
-                <a href="../Login/Usuario.php">ADM</a>
+                <a href="../Administrador/instituto.php">Quienes Somos</a>
+                <a href="../Administrador/sede.php">Mas</a>
+        
             </div>
         </div>
 

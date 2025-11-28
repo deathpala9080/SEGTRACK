@@ -51,7 +51,7 @@ class ControladorSede {
 
         if ($resultado['success'] === false) {
              // Retorna el error específico (ej. de llave foránea)
-             return $resultado; 
+            return $resultado; 
         }
         
         return ['success' => true, 'message' => 'Sede registrada correctamente.'];
