@@ -11,23 +11,15 @@ class ModeloFuncionario {
      */
     public function RegistrarFuncionario(string $cargo, string $nombre, int $idSede, int $telefono, int $documento, string $correo): array {
         try {
-            // Log de inicio
-            file_put_contents(__DIR__ . '/../Controller/debug_log.txt', "=== MODELO: registrarFuncionario ===\n", FILE_APPEND);
-            file_put_contents(__DIR__ . '/../Controller/debug_log.txt', "Cargo: $cargo, Nombre: $nombre, Sede: $idSede, Tel: $telefono, Doc: $documento\n", FILE_APPEND);
 
             if (!$this->conexion) {
-                file_put_contents(__DIR__ . '/../Controller/debug_log.txt', "ERROR: Conexión no disponible\n", FILE_APPEND);
                 return ['success' => false, 'error' => 'Conexión a la base de datos no disponible'];
             }
-
-            file_put_contents(__DIR__ . '/../Controller/debug_log.txt', "Conexión OK, preparando SQL\n", FILE_APPEND);
 
             // ⭐ CAMBIO: Agregamos QrCodigoFuncionario con valor vacío temporal
             $sql = "INSERT INTO funcionario 
                     (CargoFuncionario, NombreFuncionario, IdSede, TelefonoFuncionario, DocumentoFuncionario, CorreoFuncionario, QrCodigoFuncionario)
                     VALUES (:cargo, :nombre, :sede, :telefono, :documento, :correo, '')";
-
-            file_put_contents(__DIR__ . '/../Controller/debug_log.txt', "SQL preparado: $sql\n", FILE_APPEND);
 
             $stmt = $this->conexion->prepare($sql);
             
@@ -40,25 +32,18 @@ class ModeloFuncionario {
                 ':correo' => $correo
             ];
             
-            file_put_contents(__DIR__ . '/../Controller/debug_log.txt', "Parámetros: " . json_encode($params) . "\n", FILE_APPEND);
-            
             $resultado = $stmt->execute($params);
-
-            file_put_contents(__DIR__ . '/../Controller/debug_log.txt', "Resultado execute: " . ($resultado ? 'true' : 'false') . "\n", FILE_APPEND);
 
             if ($resultado) {
                 $lastId = $this->conexion->lastInsertId();
-                file_put_contents(__DIR__ . '/../Controller/debug_log.txt', "INSERT exitoso, ID generado: $lastId\n", FILE_APPEND);
                 return ['success' => true, 'id' => $lastId];
             } else {
                 $errorInfo = $stmt->errorInfo();
-                file_put_contents(__DIR__ . '/../Controller/debug_log.txt', "ERROR en execute: " . json_encode($errorInfo) . "\n", FILE_APPEND);
                 return ['success' => false, 'error' => $errorInfo[2] ?? 'Error desconocido al insertar'];
             }
 
         } catch (PDOException $e) {
             $errorMsg = $e->getMessage();
-            file_put_contents(__DIR__ . '/../Controller/debug_log.txt', "EXCEPCIÓN PDO: $errorMsg\n", FILE_APPEND);
             return ['success' => false, 'error' => $errorMsg];
         }
     }
