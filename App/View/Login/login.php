@@ -15,13 +15,7 @@
             <div class="logo">Segtrack</div>
             <div class="nav-links">
                 <a href="../Administrador/instituto.php">Quienes Somos</a>
-                <a href="../Administrador/sede.php">Mas</a>
-<<<<<<< HEAD
-               
-                
-=======
-        
->>>>>>> aeaa95d554d94550741f493d3c16209a9d3d135c
+                <a href="../Administrador/sede.php">Mas</a>             
             </div>
         </div>
 

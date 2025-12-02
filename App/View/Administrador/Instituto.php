@@ -2,7 +2,7 @@
 session_start();
 
 // Carga la parte superior del layout
-require_once __DIR__ . '/../layouts/parte_superior_supervisor.php';
+require_once __DIR__ . '/../layouts/parte_superior_administrador.php';
 ?>
 
 <div class="container-fluid px-4 py-4">
@@ -79,7 +79,7 @@ require_once __DIR__ . '/../layouts/parte_superior_supervisor.php';
 
 </div> <!-- FIN CONTAINER -->
 
-<?php require_once __DIR__ . '/../layouts/parte_inferior_supervisor.php'; ?>
+<?php require_once __DIR__ . '/../layouts/parte_inferior_administrador.php'; ?>
 
 
 <!-- ============================= -->

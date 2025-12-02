@@ -1,6 +1,6 @@
 <?php
 // Incluye la parte superior de la plantilla y la conexión a la base de datos
-require_once __DIR__ . '/../layouts/parte_superior_supervisor.php';
+require_once __DIR__ . '/../layouts/parte_superior_administrador.php';
 require_once __DIR__ . '/../../Core/conexion.php';
 
 // Inicialización de la conexión PDO
@@ -116,7 +116,7 @@ $roles_permitidos = ['Supervisor', 'Personal Seguridad', 'Administrador'];
         </div>
     </div>
 </div>
-<?php require_once __DIR__ . '/../layouts/parte_inferior_supervisor.php'; ?>
+<?php require_once __DIR__ . '/../layouts/parte_inferior_administrador.php'; ?>
 <!-- Dependencias JS -->
 <script src="../vendor/jquery/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

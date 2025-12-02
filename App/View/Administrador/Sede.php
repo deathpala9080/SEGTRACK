@@ -3,7 +3,7 @@
 
 session_start();
 
-require_once __DIR__ . '/../layouts/parte_superior.php';
+require_once __DIR__ . '/../layouts/parte_superior_administrador.php';
 // ATENCIÓN: Esta inclusión es SOLO para cargar las Instituciones en el <select>
 // La acción de REGISTRO POST (submit) se maneja directamente desde AJAX en ValidacionesSede.js
 require_once __DIR__ . "/../../Controller/ControladorSede.php"; 
@@ -78,7 +78,7 @@ porque el JS ahora aplicará el estilo directamente (inline). -->
     </div>
 </div>
 
-<?php require_once __DIR__ . '/../layouts/parte_inferior.php'; ?>
+<?php require_once __DIR__ . '/../layouts/parte_inferior_administrador.php'; ?>
 <script src="../../../Public/vendor/jquery/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="../../../Public/js/javascript/js/ValidacionesSede.js"></script>
