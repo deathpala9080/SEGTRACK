@@ -1,291 +1,249 @@
 <?php
 // =======================================================
-// 🛠️ GESTIÓN DE CARPETA Y RUTAS DE DEBUG (REVISADO)
+// 🛠️ CONFIGURACIÓN DE LOGS Y DEBUG (LIMPIADO Y OPTIMIZADO)
 // =======================================================
 
-// Define la ruta absoluta de la carpeta debugFunc (en el mismo directorio que el controlador)
+// Ruta donde se guardará la carpeta debugFunc
 $ruta_debug = __DIR__ . '/debugFunc';
 
-// 1. CREACIÓN DE LA CARPETA
-if (!file_exists($ruta_debug)) { 
-    // Intentar crear la carpeta. Suponemos que si falla, usaremos el directorio actual.
-    $creacion_exitosa = @mkdir($ruta_debug, 0777, true);
-    
-    // Si la creación FALLÓ (o ya existía y el @ la suprimió), 
-    // y si no podemos escribir, puede haber problemas.
-    if (!$creacion_exitosa && !is_writable($ruta_debug)) {
-        // Fallback: Si no se pudo crear, usamos el directorio actual.
-        $ruta_debug = __DIR__;
-    }
+// Crear carpeta si no existe
+if (!file_exists($ruta_debug)) {
+    mkdir($ruta_debug, 0777, true);
 }
 
-// 2. DEFINICIÓN DE RUTAS DE LOG
+// Archivos de logs
 $ruta_error_log = $ruta_debug . '/error_log.txt';
 $ruta_debug_log = $ruta_debug . '/debug_log.txt';
 
-// 3. CONFIGURACIÓN DE PHP INI
-// Activa el reporte de todos los errores de PHP
+// Configuración de errores
 error_reporting(E_ALL);
-// Desactiva la visualización de errores
-ini_set('display_errors', 0); 
-// Activa el log de errores
+ini_set('display_errors', 0);
 ini_set('log_errors', 1);
-// 🔥 CONFIGURA EL ARCHIVO DE LOG DE ERRORES DE PHP
 ini_set('error_log', $ruta_error_log);
 
-// 4. INICIALIZACIÓN (MÁS SEGURO)
-
-// Inicia el buffer de salida (útil para prevenir encabezados después de la salida)
+// Iniciar buffer de salida
 ob_start();
 
-// Configura los encabezados
+// Establecer cabeceras
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 
+// Registrar inicio de la petición
+file_put_contents($ruta_debug_log, date('Y-m-d H:i:s') . " === INICIO DE PETICIÓN ===\n", FILE_APPEND);
+file_put_contents($ruta_debug_log, "POST recibido:\n" . json_encode($_POST, JSON_PRETTY_PRINT) . "\n", FILE_APPEND);
+
+
+// =======================================================
+// 🛢️ CONEXIÓN A LA BASE DE DATOS
+// =======================================================
 try {
-    // Primera línea de log, ahora sí es seguro escribirla, 
-    // ya que la configuración de la carpeta ha terminado.
-    file_put_contents($ruta_debug_log, date('Y-m-d H:i:s') . " === INICIO DE PETICIÓN ===\n", FILE_APPEND);
-    
-    // Loguea todos los datos POST recibidos para depuración
-    file_put_contents($ruta_debug_log, "POST recibido:\n" . json_encode($_POST, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . "\n", FILE_APPEND);
 
-    // =======================================================
-    // ⚙️ INCLUSIÓN DE ARCHIVOS Y CONEXIÓN
-    // =======================================================
-
-    // Verifica y requiere la conexión a la base de datos
     $ruta_conexion = __DIR__ . '/../Core/conexion.php';
-    if (!file_exists($ruta_conexion)) {
-        throw new Exception("Archivo de conexión no encontrado: $ruta_conexion");
-    }
-    require_once $ruta_conexion;
-    file_put_contents($ruta_debug_log, "Conexión cargada\n", FILE_APPEND);
 
-    // Crea la instancia de conexión PDO
+    if (!file_exists($ruta_conexion)) {
+        throw new Exception("Archivo de conexión no encontrado");
+    }
+
+    require_once $ruta_conexion;
+
     $conexionObj = new Conexion();
     $conexion = $conexionObj->getConexion();
 
-    if (!isset($conexion) || !($conexion instanceof PDO)) {
-        throw new Exception("Conexión PDO no válida o no inicializada");
+    if (!($conexion instanceof PDO)) {
+        throw new Exception("La conexión PDO no es válida");
     }
-    file_put_contents($ruta_debug_log, "Conexión verificada como PDO\n", FILE_APPEND);
 
-    // Verifica y requiere la librería QR
+    file_put_contents($ruta_debug_log, "Conexión establecida correctamente\n", FILE_APPEND);
+
+} catch (Exception $e) {
+    echo json_encode(["success" => false, "message" => $e->getMessage()]);
+    exit;
+}
+
+
+// =======================================================
+// 📦 CARGA DE LIBRERÍAS Y MODELOS
+// =======================================================
+try {
+
+    // Librería QR
     $ruta_qrlib = __DIR__ . '/../Libraries/phpqrcode/qrlib.php';
+
     if (!file_exists($ruta_qrlib)) {
-        throw new Exception("Librería phpqrcode no encontrada: $ruta_qrlib");
+        throw new Exception("Librería QR no encontrada");
     }
+
     require_once $ruta_qrlib;
     file_put_contents($ruta_debug_log, "Librería QR cargada\n", FILE_APPEND);
 
-    // Verifica y requiere el modelo
-    $ruta_modelo = __DIR__ . "/../Model/ModeloFuncionarios.php";
+    // Modelo
+    $ruta_modelo = __DIR__ . '/../Model/ModeloFuncionarios.php';
+
     if (!file_exists($ruta_modelo)) {
-        throw new Exception("Modelo no encontrado: $ruta_modelo");
+        throw new Exception("ModeloFuncionarios no encontrado");
     }
+
     require_once $ruta_modelo;
-    file_put_contents($ruta_debug_log, "Modelo cargado\n", FILE_APPEND);
-
-    // =======================================================
-    // 🏛️ CLASE CONTROLADOR
-    // =======================================================
-
-    class ControladorFuncionario {
-        private $modelo;
-        private $ruta_log; 
-
-        public function __construct($conexion, $ruta_log_externa) {
-            $this->modelo = new ModeloFuncionario($conexion);
-            $this->ruta_log = $ruta_log_externa;
-        }
-
-        // Función auxiliar para verificar si un campo está vacío o nulo
-        private function campoVacio($campo): bool {
-            return !isset($campo) || $campo === '' || trim($campo) === '';
-        }
-
-        // Función auxiliar para escribir logs, centralizando la lógica
-        private function escribirLog(string $mensaje) {
-             file_put_contents($this->ruta_log, date('Y-m-d H:i:s') . " - " . $mensaje . "\n", FILE_APPEND);
-        }
-
-        // Genera el código QR y lo guarda en la ruta pública
-        private function generarQR(int $idFuncionario, string $nombre, string $documento): ?string {
-            try {
-                $this->escribirLog("Generando QR para funcionario ID: $idFuncionario");
-
-                // Ruta ABSOLUTA para guardar el archivo en Public/qr/Qr_Func
-                // (../../ sale de App/Controller a SEGTRAK, luego entra a Public)
-                $rutaCarpeta = __DIR__ . '/../../Public/qr/Qr_Func';
-                
-                if (!file_exists($rutaCarpeta)) {
-                    mkdir($rutaCarpeta, 0777, true);
-                    $this->escribirLog("Carpeta QR creada: $rutaCarpeta");
-                }
-
-                $nombreArchivo = "QR-FUNC-" . $idFuncionario . "-" . uniqid() . ".png";
-                $rutaCompleta = $rutaCarpeta . '/' . $nombreArchivo;
-                $contenidoQR = "ID: $idFuncionario\nNombre: $nombre\nDocumento: $documento";
-
-                // Genera el archivo PNG del QR
-                QRcode::png($contenidoQR, $rutaCompleta, QR_ECLEVEL_H, 10);
-
-                if (!file_exists($rutaCompleta)) {
-                    throw new Exception("El archivo QR no se creó correctamente");
-                }
-
-                $this->escribirLog("QR generado exitosamente: $rutaCompleta");
-                
-                // Retorna la ruta RELATIVA que la VISTA (front-end) puede usar
-                return 'qr/Qr_Func/' . $nombreArchivo; 
-
-            } catch (Exception $e) {
-                $this->escribirLog("ERROR al generar QR: " . $e->getMessage());
-                return null;
-            }
-        }
-
-        // Lógica para registrar un nuevo funcionario
-        public function registrarFuncionario(array $datos): array {
-            $this->escribirLog("registrarFuncionario llamado");
-            
-            $cargo = $datos['CargoFuncionario'] ?? null;
-            $nombre = $datos['NombreFuncionario'] ?? null;
-            $sede = $datos['IdSede'] ?? null;
-            $telefono = $datos['TelefonoFuncionario'] ?? null;
-            $documento = $datos['DocumentoFuncionario'] ?? null;
-            $correo = $datos['CorreoFuncionario'] ?? null;
-
-            // Validaciones
-            if ($this->campoVacio($cargo)) {
-                $this->escribirLog("ERROR: Cargo vacío");
-                return ['success' => false, 'message' => 'Falta el campo: Cargo'];
-            }
-            if ($this->campoVacio($nombre)) {
-                $this->escribirLog("ERROR: Nombre vacío");
-                return ['success' => false, 'message' => 'Falta el campo: Nombre'];
-            }
-            if ($this->campoVacio($sede)) {
-                $this->escribirLog("ERROR: Sede vacía");
-                return ['success' => false, 'message' => 'Falta el campo: Sede'];
-            }
-            if ($this->campoVacio($documento)) {
-                $this->escribirLog("ERROR: Documento vacío");
-                return ['success' => false, 'message' => 'Falta el campo: Documento'];
-            }
-
-            try {
-                $resultado = $this->modelo->RegistrarFuncionario(
-                    $cargo, 
-                    $nombre, 
-                    (int)$sede, 
-                    (int)$telefono, 
-                    (int)$documento, 
-                    $correo
-                );
-
-                if ($resultado['success']) {
-                    $idFuncionario = $resultado['id'];
-                    $rutaQR = $this->generarQR($idFuncionario, $nombre, $documento);
-
-                    if ($rutaQR) {
-                        // Actualiza la BD con la ruta del QR generado
-                        $this->modelo->ActualizarQrFuncionario($idFuncionario, $rutaQR);
-                    }
-
-                    return [
-                        "success" => true,
-                        "message" => "Funcionario registrado correctamente con ID: " . $idFuncionario,
-                        "data" => ["IdFuncionario" => $idFuncionario, "QrCodigoFuncionario" => $rutaQR]
-                    ];
-                } else {
-                    return ['success' => false, 'message' => $resultado['message'] ?? 'Error al registrar en BD'];
-                }
-            } catch (Exception $e) {
-                $this->escribirLog("EXCEPCIÓN: " . $e->getMessage());
-                return ['success' => false, 'message' => 'Error: ' . $e->getMessage()];
-            }
-        }
-
-        // Lógica para actualizar un funcionario existente
-        public function actualizarFuncionario(int $id, array $datos): array {
-            $this->escribirLog("actualizarFuncionario llamado con ID: $id");
-            $this->escribirLog("Datos a actualizar: " . json_encode($datos));
-
-            try {
-                $resultado = $this->modelo->actualizar($id, $datos);
-                
-                if ($resultado['success']) {
-                    $this->escribirLog("Funcionario actualizado exitosamente");
-                    return ['success' => true, 'message' => 'Funcionario actualizado correctamente'];
-                } else {
-                    $this->escribirLog("Error al actualizar: " . ($resultado['error'] ?? 'desconocido'));
-                    return ['success' => false, 'message' => 'Error al actualizar funcionario'];
-                }
-            } catch (Exception $e) {
-                $this->escribirLog("EXCEPCIÓN en actualizar: " . $e->getMessage());
-                return ['success' => false, 'message' => 'Error: ' . $e->getMessage()];
-            }
-        }
-        
-    }
-
-    // =======================================================
-    // 🏃 LÓGICA DE EJECUCIÓN (ENRUTAMIENTO)
-    // =======================================================
-
-    // Instancia el controlador, pasándole la conexión y la ruta de log
-    $controlador = new ControladorFuncionario($conexion, $ruta_debug_log); 
-    $accion = $_POST['accion'] ?? 'registrar';
-
-    file_put_contents($ruta_debug_log, "Acción: $accion\n", FILE_APPEND);
-
-    // Enrutamiento de la acción
-    if ($accion === 'registrar') {
-        $resultado = $controlador->registrarFuncionario($_POST);
-    } elseif ($accion === 'actualizar') {
-        $id = (int)($_POST['id'] ?? 0);
-        if ($id > 0) {
-            $datos = [
-                'CargoFuncionario' => $_POST['cargo'] ?? null,
-                'NombreFuncionario' => $_POST['nombre'] ?? null,
-                'IdSede' => !empty($_POST['sede']) ? (int)$_POST['sede'] : null,
-                'TelefonoFuncionario' => !empty($_POST['telefono']) ? (int)$_POST['telefono'] : null,
-                'DocumentoFuncionario' => !empty($_POST['documento']) ? (int)$_POST['documento'] : null,
-                'CorreoFuncionario' => $_POST['correo'] ?? null
-            ];
-            $resultado = $controlador->actualizarFuncionario($id, $datos);
-        } else {
-            $resultado = ['success' => false, 'message' => 'ID de funcionario no válido'];
-        }
-    } else {
-        $resultado = ['success' => false, 'message' => 'Acción no reconocida'];
-    }
-
-    // Loguea la respuesta final
-    file_put_contents($ruta_debug_log, "Respuesta final: " . json_encode($resultado) . "\n", FILE_APPEND);
-
-    // Finaliza el buffer de salida y envía la respuesta JSON
-    ob_end_clean();
-    echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
+    file_put_contents($ruta_debug_log, "Modelo Funcionarios cargado\n", FILE_APPEND);
 
 } catch (Exception $e) {
-    // =======================================================
-    // 🚨 MANEJO DE ERRORES FATALES
-    // =======================================================
-    ob_end_clean();
-    
-    $error = $e->getMessage();
-    // Loguea el error final en el archivo correcto
-    file_put_contents($ruta_debug_log, "ERROR FATAL: $error\n", FILE_APPEND); 
-    
-    // Envía la respuesta de error al cliente
-    echo json_encode([
-        'success' => false,
-        'message' => 'Error del servidor: ' . $error,
-        'error' => $error
-    ], JSON_UNESCAPED_UNICODE);
+    echo json_encode(["success" => false, "message" => $e->getMessage()]);
+    exit;
 }
 
-exit;
+
+// =======================================================
+// 🏛️ CONTROLADOR DE FUNCIONARIOS (POO)
+// =======================================================
+class ControladorFuncionario {
+
+    private $modelo;
+    private $log;
+
+    public function __construct($conexion, $ruta_log) {
+        $this->modelo = new ModeloFuncionario($conexion);
+        $this->log = $ruta_log;
+    }
+
+    private function log($msg) {
+        file_put_contents($this->log, date('Y-m-d H:i:s') . " - $msg\n", FILE_APPEND);
+    }
+
+    private function campoVacio($campo): bool {
+        return !isset($campo) || trim($campo) === '';
+    }
+
+    // ----------------------------------------------------
+    // 📌 GENERAR QR
+    // ----------------------------------------------------
+    private function generarQR($id, $nombre, $documento) {
+
+        $this->log("Generando QR para ID $id");
+
+        $carpeta = __DIR__ . '/../../Public/qr/Qr_Func';
+
+        if (!file_exists($carpeta)) {
+            mkdir($carpeta, 0777, true);
+            $this->log("Carpeta QR creada: $carpeta");
+        }
+
+        $archivo = "QR-FUNC-$id-" . uniqid() . ".png";
+        $rutaCompleta = "$carpeta/$archivo";
+
+        $contenido = "ID: $id\nNombre: $nombre\nDocumento: $documento";
+
+        QRcode::png($contenido, $rutaCompleta, QR_ECLEVEL_H, 10);
+
+        if (!file_exists($rutaCompleta)) {
+            throw new Exception("No se pudo generar el QR");
+        }
+
+        return "qr/Qr_Func/$archivo";
+    }
+
+    // ----------------------------------------------------
+    // 🟢 REGISTRAR FUNCIONARIO
+    // ----------------------------------------------------
+    public function registrarFuncionario($datos) {
+
+        $this->log("registrarFuncionario iniciado");
+
+        $cargo      = $datos["CargoFuncionario"] ?? null;
+        $nombre     = $datos["NombreFuncionario"] ?? null;
+        $sede       = $datos["IdSede"] ?? null;
+        $telefono   = $datos["TelefonoFuncionario"] ?? null;
+        $documento  = $datos["DocumentoFuncionario"] ?? null;
+        $correo     = $datos["CorreoFuncionario"] ?? null;
+
+        // Validaciones
+        if ($this->campoVacio($cargo)) return ["success" => false, "message" => "Falta el Cargo"];
+        if ($this->campoVacio($nombre)) return ["success" => false, "message" => "Falta el Nombre"];
+        if ($this->campoVacio($sede)) return ["success" => false, "message" => "Falta la Sede"];
+        if ($this->campoVacio($documento)) return ["success" => false, "message" => "Falta el Documento"];
+
+        try {
+
+            // Registrar BD
+            $resultado = $this->modelo->RegistrarFuncionario(
+                $cargo,
+                $nombre,
+                (int)$sede,
+                (int)$telefono,
+                (int)$documento,
+                $correo
+            );
+
+            if (!$resultado["success"]) {
+                return ["success" => false, "message" => $resultado["message"]];
+            }
+
+            $id = $resultado["id"];
+
+            // Generar QR
+            $rutaQR = $this->generarQR($id, $nombre, $documento);
+            $this->modelo->ActualizarQrFuncionario($id, $rutaQR);
+
+            return [
+                "success" => true,
+                "message" => "Funcionario registrado exitosamente",
+                "data" => [
+                    "IdFuncionario" => $id,
+                    "QrCodigo" => $rutaQR
+                ]
+            ];
+
+        } catch (Exception $e) {
+
+            $this->log("ERROR registrarFuncionario: " . $e->getMessage());
+            return ["success" => false, "message" => $e->getMessage()];
+        }
+    }
+
+    // ----------------------------------------------------
+    // 🟡 ACTUALIZAR FUNCIONARIO
+    // ----------------------------------------------------
+    public function actualizarFuncionario($id, $datos) {
+
+        $this->log("actualizarFuncionario ID: $id");
+
+        try {
+            $resp = $this->modelo->actualizar($id, $datos);
+
+            if (!$resp["success"]) {
+                return ["success" => false, "message" => "Error al actualizar"];
+            }
+
+            return ["success" => true, "message" => "Funcionario actualizado"];
+
+        } catch (Exception $e) {
+            return ["success" => false, "message" => $e->getMessage()];
+        }
+    }
+}
+
+
+// =======================================================
+// 🎯 PROCESAR ACCIÓN DEL POST
+// =======================================================
+$controlador = new ControladorFuncionario($conexion, $ruta_debug_log);
+
+if (isset($_POST["accion"])) {
+    switch ($_POST["accion"]) {
+
+        case "registrar":
+            $respuesta = $controlador->registrarFuncionario($_POST);
+            break;
+
+        case "actualizar":
+            $id = (int) $_POST["IdFuncionario"];
+            $respuesta = $controlador->actualizarFuncionario($id, $_POST);
+            break;
+
+        default:
+            $respuesta = ["success" => false, "message" => "Acción no válida"];
+    }
+
+    echo json_encode($respuesta);
+} else {
+    echo json_encode(["success" => false, "message" => "No se envió acción"]);
+}
