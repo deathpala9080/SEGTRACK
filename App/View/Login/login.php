@@ -14,8 +14,8 @@
         <div class="navbar">
             <div class="logo">Segtrack</div>
             <div class="nav-links">
-                <a href="../Administrador/instituto.php">Quienes Somos</a>
-                <a href="../Administrador/sede.php">Mas</a>             
+                <a href="#">Quienes Somos</a>
+                <a href="#">Mas</a>             
             </div>
         </div>
 
@@ -57,7 +57,7 @@
                     </div>
 
                     <div class="links">
-                        <a href="#" onclick="return false;">¿Olvidaste tu contraseña?</a>
+                        <a href="recuperar_password.php">¿Recuperar contraseña?</a>
                     </div>
                 </div>
             </div>
