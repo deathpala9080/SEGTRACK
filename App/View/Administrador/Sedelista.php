@@ -1,4 +1,4 @@
-<?php require_once __DIR__ . '/../layouts/parte_superior.php'; ?>
+<?php require_once __DIR__ . '/../layouts/parte_superior_administrador.php'; ?>
 
 <div class="container-fluid px-4 py-4">
 
@@ -14,7 +14,7 @@
 
     <!-- ==============================
          📌 CARGAR DATOS
-    =============================== -->
+    ================================= -->
     <?php
     require_once __DIR__ . "../../../Core/conexion.php";
     require_once __DIR__ . "../../../Controller/ControladorSede.php";
@@ -24,96 +24,23 @@
 
     $controlador = new ControladorSede();
 
-    // FILTROS DINÁMICOS
-    $filtros = [];
-    $params = [];
-
-    if (!empty($_GET['tipo'])) {
-        $filtros[] = "TipoSede LIKE :tipo";
-        $params[':tipo'] = '%' . $_GET['tipo'] . '%';
-    }
-
-    if (!empty($_GET['ciudad'])) {
-        $filtros[] = "Ciudad LIKE :ciudad";
-        $params[':ciudad'] = '%' . $_GET['ciudad'] . '%';
-    }
-
-    if (!empty($_GET['institucion'])) {
-        $filtros[] = "IdInstitucion = :institucion";
-        $params[':institucion'] = intval($_GET['institucion']);
-    }
-
-    $where = "";
-    if (count($filtros) > 0) {
-        $where = "WHERE " . implode(" AND ", $filtros);
-    }
-
+    // Consulta de todas las sedes con su institución
     $sql = "SELECT sede.IdSede, sede.TipoSede, sede.Ciudad, sede.IdInstitucion,
             institucion.NombreInstitucion
             FROM sede 
             LEFT JOIN institucion ON sede.IdInstitucion = institucion.IdInstitucion
-            $where
             ORDER BY sede.IdSede DESC";
 
     $stmt = $conn->prepare($sql);
-    $stmt->execute($params);
+    $stmt->execute();
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $listaInstituciones = $controlador->obtenerInstituciones();
     ?>
 
     <!-- ==============================
-         🎯 FILTROS
-    =============================== -->
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 bg-light">
-            <h6 class="m-0 font-weight-bold text-primary">Filtrar Sedes</h6>
-        </div>
-
-        <div class="card-body">
-            <form method="get" class="row g-3">
-
-                <div class="col-md-3">
-                    <label class="form-label">Tipo de Sede</label>
-                    <input type="text" name="tipo" class="form-control"
-                        value="<?= $_GET['tipo'] ?? '' ?>" placeholder="Ej: Principal">
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Ciudad</label>
-                    <input type="text" name="ciudad" class="form-control"
-                        value="<?= $_GET['ciudad'] ?? '' ?>" placeholder="Ej: Medellín">
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Institución</label>
-                    <select name="institucion" class="form-control">
-                        <option value="">-- Todas --</option>
-                        <?php foreach ($listaInstituciones as $inst): ?>
-                            <option value="<?= $inst['IdInstitucion']; ?>"
-                                <?= (($_GET['institucion'] ?? '') == $inst['IdInstitucion']) ? 'selected' : '' ?>>
-                                <?= $inst['NombreInstitucion']; ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
-                <div class="col-md-3 d-flex align-items-end">
-                    <button class="btn btn-primary me-2" type="submit">
-                        <i class="fas fa-filter me-1"></i> Filtrar
-                    </button>
-                    <a href="SedeLista.php" class="btn btn-secondary">
-                        <i class="fas fa-broom me-1"></i> Limpiar
-                    </a>
-                </div>
-
-            </form>
-        </div>
-    </div>
-
-    <!-- ==============================
-         📋 TABLA DE SEDES
-    =============================== -->
+         📋 TABLA SIN ID (usando data-id)
+    ================================= -->
     <div class="card shadow mb-4">
 
         <div class="card-header bg-light py-3">
@@ -123,11 +50,10 @@
         <div class="card-body">
 
             <div class="table-responsive">
-                <table class="table table-bordered table-hover">
+                <table id="tablaSedes" class="table table-bordered table-hover" style="width:100%">
 
                     <thead class="thead-dark">
                         <tr>
-                            <th>ID</th>
                             <th>Tipo</th>
                             <th>Ciudad</th>
                             <th>Institución</th>
@@ -138,48 +64,33 @@
                     <tbody>
                         <?php if ($result): ?>
                             <?php foreach ($result as $row): ?>
-                                <tr>
-                                    <td><?= $row['IdSede']; ?></td>
+                                <tr data-id="<?= $row['IdSede']; ?>" data-institucion="<?= $row['IdInstitucion']; ?>">
+
                                     <td><?= htmlspecialchars($row['TipoSede']); ?></td>
                                     <td><?= htmlspecialchars($row['Ciudad']); ?></td>
                                     <td><?= $row['NombreInstitucion'] ?? 'Sin institución'; ?></td>
 
                                     <td class="text-center">
-                                        <button class="btn btn-sm btn-outline-primary"
-                                            data-toggle="modal"
-                                            data-target="#modalEditar"
-                                            onclick="cargarEdicion(
-                                                <?= $row['IdSede']; ?>,
-                                                '<?= htmlspecialchars($row['TipoSede']); ?>',
-                                                '<?= htmlspecialchars($row['Ciudad']); ?>',
-                                                <?= $row['IdInstitucion']; ?>
-                                            )">
+                                        <button class="btn btn-sm btn-outline-primary btn-editar">
                                             <i class="fas fa-edit"></i> Editar
                                         </button>
                                     </td>
+
                                 </tr>
                             <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="5" class="text-center py-4">
-                                    <i class="fas fa-exclamation-circle fa-2x mb-2 text-muted"></i>
-                                    <p class="text-muted">No se encontraron sedes registradas.</p>
-                                </td>
-                            </tr>
                         <?php endif; ?>
                     </tbody>
 
                 </table>
             </div>
-
         </div>
     </div>
 
 </div>
 
-<!-- ==============================
+<!-- ====================================
      ✨ MODAL EDITAR SEDE
-============================== -->
+====================================== -->
 <div class="modal fade" id="modalEditar" tabindex="-1" role="dialog">
 
     <div class="modal-dialog" role="document">
@@ -195,6 +106,7 @@
             <div class="modal-body">
                 <form id="formEditar">
 
+                    <!-- ID oculto -->
                     <input type="hidden" id="editId">
 
                     <div class="mb-3">
@@ -228,23 +140,75 @@
 
         </div>
     </div>
-
 </div>
 
+<?php require_once __DIR__ . '/../layouts/parte_inferior_administrador.php'; ?>
+
+
+<!-- ==============================
+     📦 DATATABLES CSS
+============================== -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap4.min.css">
+
+<!-- ==============================
+     📦 DATATABLES JS
+============================== -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+
+<!-- SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
-// =========================
-//  📝 Cargar datos en modal
-// =========================
-function cargarEdicion(id, tipo, ciudad, institucion) {
+/* ==========================================================
+   📌 INICIALIZAR DATATABLES (SIN PDF NI EXCEL)
+========================================================== */
+$(document).ready(function() {
+    $('#tablaSedes').DataTable({
+        responsive: true,
+        language: {
+            url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+        },
+        dom: 'Bfrtip',
+        buttons: [
+            { extend: 'copy', className: 'btn btn-secondary btn-sm', text: 'Copiar' },
+            { extend: 'print', className: 'btn btn-info btn-sm', text: 'Imprimir' }
+        ],
+        pageLength: 10,
+        lengthMenu: [[5,10,25,50,-1],[5,10,25,50,'Todos']],
+    });
+});
+
+/* ==========================================================
+   📌 Cargar datos al hacer clic en Editar
+========================================================== */
+$(document).on('click', '.btn-editar', function () {
+
+    const fila = $(this).closest('tr');
+    const id = fila.data('id');
+
+    const tipo = fila.find('td:eq(0)').text();
+    const ciudad = fila.find('td:eq(1)').text();
+    const institucion = fila.data('institucion');
+
     $('#editId').val(id);
     $('#editTipo').val(tipo);
     $('#editCiudad').val(ciudad);
     $('#editInstitucion').val(institucion);
-}
 
-// =========================
-//  💾 Guardar cambios AJAX
-// =========================
+    $('#modalEditar').modal('show');
+});
+
+/* ==========================================================
+   📌 Guardar cambios por AJAX
+========================================================== */
 $('#btnGuardar').click(function () {
 
     const data = {
@@ -263,20 +227,21 @@ $('#btnGuardar').click(function () {
 
         success: function (response) {
             $('#modalEditar').modal('hide');
-            if (response.success) {
-                alert('Sede actualizada correctamente');
-                location.reload();
-            } else {
-                alert('Error: ' + response.message);
-            }
+
+            Swal.fire({
+                icon: response.success ? 'success' : 'error',
+                title: response.success ? '¡Éxito!' : 'Error',
+                text: response.message,
+            }).then(() => { location.reload(); });
         },
 
         error: function () {
-            $('#modalEditar').modal('hide');
-            alert('Error en la solicitud');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error en la solicitud',
+            });
         }
     });
 });
 </script>
-
-<?php require_once __DIR__ . '/../layouts/parte_inferior.php'; ?>

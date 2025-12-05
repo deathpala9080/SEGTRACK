@@ -1,67 +1,162 @@
 <?php
-// App/Controller/ControladorInstituto.php
+// ==========================================================
+// CONTROLADOR: Controladorinstituto.php
+// ==========================================================
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 header('Content-Type: application/json; charset=utf-8');
 
 try {
-    // 1. Incluir el modelo. Si falla el require_once, el script se detiene.
-    require_once __DIR__ . '/../Model/modeloinstituto.php'; 
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        
-        // ... (Recolección de datos y Validación aquí) ...
-        
-        $nombre = trim($_POST['NombreInstitucion'] ?? '');
-        $nit = trim($_POST['Nit_Codigo'] ?? '');
-        $tipo = trim($_POST['TipoInstitucion'] ?? '');
-        $estado = trim($_POST['EstadoInstitucion'] ?? 'Activo');
+    require_once __DIR__ . '/../Model/modeloinstituto.php';
 
-        if (empty($nombre) || strlen($nombre) < 3 || strlen($nit) !== 10 || empty($tipo)) {
-            throw new Exception("Faltan campos obligatorios o los datos son incorrectos.");
-        }
+    $institutoModel = new ModeloInstituto();
 
-        // 2. Instanciación e Inserción
-        // Si la clase Conexion falla al llamarse, el script muere, pero si llegamos aquí,
-        // la única forma de que falle es si el constructor del modelo lanza una excepción.
-        $institutoModel = new ModeloInstituto(); 
-        
-        $datosRegistro = [
-            'NombreInstitucion' => $nombre,
-            'Nit_Codigo' => $nit,
-            'TipoInstitucion' => $tipo,
-            'EstadoInstitucion' => $estado
-        ];
-        
-        $respuestaModelo = $institutoModel->insertarInstituto($datosRegistro); 
+    // IMPORTANTE: Primero POST, luego GET
+    $accion = $_POST['accion'] ?? $_GET['accion'] ?? '';
 
-        if ($respuestaModelo['error'] === true) {
-            throw new Exception($respuestaModelo['mensaje']);
-        }
+    switch ($accion) {
 
-        // Respuesta EXITOSA
-        echo json_encode([
-            'ok' => true,
-            'message' => $respuestaModelo['mensaje'] 
-        ]);
-        exit;
-        
-    } else {
-        http_response_code(405);
-        echo json_encode(['ok' => false, 'message' => 'Método no permitido.']);
-        exit;
+        // REGISTRAR
+        case 'registrar':
+            $nombre = trim($_POST['NombreInstitucion'] ?? '');
+            $nit = trim($_POST['Nit_Codigo'] ?? '');
+            $tipo = trim($_POST['TipoInstitucion'] ?? '');
+            $estado = trim($_POST['EstadoInstitucion'] ?? 'Activo');
+
+            if (strlen($nombre) < 3) {
+                throw new Exception("El nombre debe tener al menos 3 caracteres.");
+            }
+            if (!ctype_digit($nit) || strlen($nit) !== 10) {
+                throw new Exception("El NIT debe tener exactamente 10 dígitos.");
+            }
+            if (empty($tipo)) {
+                throw new Exception("Debe seleccionar el tipo de institución.");
+            }
+
+            $data = [
+                "NombreInstitucion" => $nombre,
+                "Nit_Codigo" => $nit,
+                "TipoInstitucion" => $tipo,
+                "EstadoInstitucion" => $estado
+            ];
+
+            $respuesta = $institutoModel->insertarInstituto($data);
+            echo json_encode($respuesta);
+            exit;
+
+        // LISTAR
+        case 'listar':
+            $lista = $institutoModel->listarInstitutos();
+            echo json_encode(["data" => $lista]);
+            exit;
+
+        // OBTENER (para edición)
+        case 'obtener':
+            $id = intval($_GET['IdInstitucion'] ?? $_POST['IdInstitucion'] ?? 0);
+            
+            if ($id <= 0) {
+                echo json_encode([
+                    "ok" => false,
+                    "message" => "ID inválido."
+                ]);
+                exit;
+            }
+
+            $institucion = $institutoModel->obtenerInstitutoPorId($id);
+            
+            if ($institucion) {
+                echo json_encode([
+                    "ok" => true,
+                    "data" => $institucion
+                ]);
+            } else {
+                echo json_encode([
+                    "ok" => false,
+                    "message" => "Institución no encontrada."
+                ]);
+            }
+            exit;
+
+        // EDITAR
+        case 'editar':
+            $id = intval($_POST['IdInstitucion'] ?? 0);
+            $nombre = trim($_POST['NombreInstitucion'] ?? '');
+            $nit = trim($_POST['Nit_Codigo'] ?? '');
+            $tipo = trim($_POST['TipoInstitucion'] ?? '');
+            $estado = trim($_POST['EstadoInstitucion'] ?? '');
+
+            if ($id <= 0) {
+                throw new Exception("ID inválido.");
+            }
+            if (strlen($nombre) < 3) {
+                throw new Exception("El nombre debe tener al menos 3 caracteres.");
+            }
+            if (empty($nit)) {
+                throw new Exception("El NIT es obligatorio.");
+            }
+
+            $dataEditar = [
+                "IdInstitucion" => $id,
+                "NombreInstitucion" => $nombre,
+                "Nit_Codigo" => $nit,
+                "TipoInstitucion" => $tipo,
+                "EstadoInstitucion" => $estado
+            ];
+
+            $respuesta = $institutoModel->editarInstituto($dataEditar);
+            echo json_encode($respuesta);
+            exit;
+
+        // CAMBIAR ESTADO (toggle rápido Activo/Inactivo)
+        case 'cambiarEstado':
+            $id = intval($_POST['IdInstitucion'] ?? 0);
+            $nuevoEstado = trim($_POST['EstadoInstitucion'] ?? '');
+
+            if ($id <= 0) {
+                echo json_encode([
+                    "ok" => false,
+                    "message" => "ID inválido."
+                ]);
+                exit;
+            }
+
+            if (!in_array($nuevoEstado, ['Activo', 'Inactivo'])) {
+                echo json_encode([
+                    "ok" => false,
+                    "message" => "Estado no válido."
+                ]);
+                exit;
+            }
+
+            $respuesta = $institutoModel->cambiarEstado($id, $nuevoEstado);
+            echo json_encode($respuesta);
+            exit;
+
+        // Acción vacía o no válida
+        case '':
+            echo json_encode([
+                "ok" => false,
+                "message" => "No se especificó ninguna acción."
+            ]);
+            exit;
+
+        default:
+            echo json_encode([
+                "ok" => false,
+                "message" => "Acción no válida: '" . $accion . "'"
+            ]);
+            exit;
     }
 
 } catch (Exception $e) {
-    // Este catch captura errores de la clase ModeloInstituto, validación, o lógica.
-    http_response_code(400); 
+    http_response_code(400);
     echo json_encode([
         'ok' => false,
-        'message' => 'Error de Servidor: ' . $e->getMessage()
+        'message' => $e->getMessage()
     ]);
     exit;
 }
-// *** Si el script muere debido a die() en Conexion.php, la única solución es que ***
-// *** la base de datos 'segtrackdb' y las credenciales sean correctas. ***
 ?>

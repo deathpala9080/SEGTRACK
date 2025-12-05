@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    console.log('=== SISTEMA DE REGISTRO DE INSTITUTO INICIADO ===');
+    console.log('=== SISTEMA DE REGISTRO/EDICIÓN DE INSTITUTO INICIADO ===');
     
     // ===== FUNCIONES DE VALIDACIÓN VISUAL INLINE =====
     
@@ -18,7 +18,10 @@ $(document).ready(function () {
         campo.css("box-shadow", "");
     }
     
-    // ===== FUNCIÓN DE INICIALIZACIÓN VISUAL (NEW) =====
+    // ===== DETECTAR MODO EDICIÓN =====
+    var modoEdicion = $('input[name="IdInstitucion"]').length > 0;
+    
+    // ===== FUNCIÓN DE INICIALIZACIÓN VISUAL =====
     // Fuerza a que los campos de selección inicien neutrales.
     function inicializarValidacion() {
         marcarNeutral($("#TipoInstitucion"));
@@ -27,6 +30,15 @@ $(document).ready(function () {
 
     // Ejecutar la inicialización al cargar la página
     inicializarValidacion();
+
+    // ===== SI ESTAMOS EN MODO EDICIÓN, MARCAR CAMPOS EN ROJO AL INICIO =====
+    if (modoEdicion) {
+        console.log('=== MODO EDICIÓN DETECTADO ===');
+        setTimeout(function() {
+            marcarInvalido($("#NombreInstitucion"));
+            marcarInvalido($("#Nit_Codigo"));
+        }, 100);
+    }
 
 
     // ===== VALIDACIÓN EN TIEMPO REAL (VERDE/ROJO INMEDIATO) =====
@@ -63,7 +75,7 @@ $(document).ready(function () {
         }
     });
 
-    // 3. TIPO DE INSTITUCIÓN (Se elimina .trigger('change'))
+    // 3. TIPO DE INSTITUCIÓN
     $("#TipoInstitucion").on("change", function () {
         let campo = $(this);
         if (campo.val() !== "") {
@@ -73,7 +85,7 @@ $(document).ready(function () {
         }
     });
 
-    // 4. ESTADO (Se elimina .trigger('change'))
+    // 4. ESTADO
     $("#EstadoInstitucion").on("change", function () {
         let campo = $(this);
         if (campo.val() !== "") {
@@ -84,7 +96,7 @@ $(document).ready(function () {
     });
 
     
-    // ===== FUNCIÓN DE ENVÍO DE REGISTRO (AJAX) =====
+    // ===== FUNCIÓN DE ENVÍO DE REGISTRO/EDICIÓN (AJAX) =====
     $("#formInstituto").submit(function (e) {
         e.preventDefault();
 
@@ -138,8 +150,13 @@ $(document).ready(function () {
         
         // --- PROCESO AJAX ---
         
+        // Detectar si es edición o registro
+        var esEdicion = $('input[name="IdInstitucion"]').length > 0;
+        var tituloAccion = esEdicion ? 'Actualizando institución...' : 'Registrando institución...';
+        var tituloExito = esEdicion ? '¡Actualización Exitosa!' : '¡Registro Exitoso!';
+        
         Swal.fire({ 
-            title: 'Registrando institución...',
+            title: tituloAccion,
             html: 'Por favor espere',
             allowOutsideClick: false,
             didOpen: () => Swal.showLoading()
@@ -150,7 +167,7 @@ $(document).ready(function () {
         btn.prop('disabled', true); 
 
         $.ajax({
-            url: '../../Controller/ControladorInstituto.php', 
+            url: '../../Controller/Controladorinstituto.php', 
             type: "POST",
             data: $(this).serialize(),
             dataType: 'json', 
@@ -160,20 +177,26 @@ $(document).ready(function () {
                 if (response.ok === true) {
                     Swal.fire({
                         icon: "success",
-                        title: "¡Registro Exitoso!",
+                        title: tituloExito,
                         text: response.message, 
                         confirmButtonText: "OK",
                         confirmButtonColor: "#10b981"
                     }).then(() => {
-                        $("#formInstituto")[0].reset();
-                        // Limpiar estilos después del éxito
-                        inicializarValidacion(); // Vuelve a dejarlos neutrales
+                        if (esEdicion) {
+                            // Si es edición, redirigir a la lista
+                            window.location.href = 'InstitutoLista.php';
+                        } else {
+                            // Si es registro, limpiar formulario
+                            $("#formInstituto")[0].reset();
+                            // Limpiar estilos después del éxito
+                            inicializarValidacion(); // Vuelve a dejarlos neutrales
+                        }
                     });
                 } else {
                     Swal.fire({
                         icon: "error",
-                        title: "Error en el Registro",
-                        text: response.message || 'Ocurrió un error inesperado al registrar.', 
+                        title: "Error en " + (esEdicion ? "la Actualización" : "el Registro"),
+                        text: response.message || 'Ocurrió un error inesperado al guardar.', 
                         confirmButtonText: "OK",
                         confirmButtonColor: "#ef4444"
                     });
@@ -182,8 +205,10 @@ $(document).ready(function () {
             error: function (xhr) {
                 Swal.close(); 
                 
-                // Limpiar estilos en caso de error de conexión/servidor
-                inicializarValidacion(); // Vuelve a dejarlos neutrales
+                // Limpiar estilos en caso de error (solo en registro)
+                if (!esEdicion) {
+                    inicializarValidacion(); // Vuelve a dejarlos neutrales
+                }
 
                 let mensaje = `Error de conexión con el servidor. Revisar logs de PHP.`;
                 let responseMessage = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : xhr.responseText;
